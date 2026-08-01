@@ -1,0 +1,26 @@
+BasedOnStyle: LLVM
+ColumnLimit: 100
+IndentWidth: 4
+TabWidth: 4
+UseTab: Never
+AccessModifierOffset: -4
+NamespaceIndentation: None
+AllowShortFunctionsOnASingleLine: Inline
+AllowShortIfStatementsOnASingleLine: false
+AllowShortLoopsOnASingleLine: false
+BinPackArguments: false
+BinPackParameters: false
+BreakBeforeBraces: Attach
+PointerAlignment: Left
+ReferenceAlignment: Left
+SpaceAfterTemplateKeyword: false
+SortIncludes: CaseSensitive
+IncludeBlocks: Regroup
+IncludeCategories:
+  - Regex: '^"'
+    Priority: 1
+  - Regex: '^<aud/'
+    Priority: 2
+  - Regex: '^<'
+    Priority: 3
+Standard: c++20

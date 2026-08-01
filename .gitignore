@@ -1,0 +1,84 @@
+# Build directories
+/build/
+/out/
+/bin/
+/lib/
+/obj/
+
+# Local Docs
+/documentation/
+
+# CMake generated files
+CMakeCache.txt
+CMakeFiles/
+CMakeScripts/
+cmake_install.cmake
+Makefile
+install_manifest.txt
+compile_commands.json
+CTestTestfile.cmake
+Testing/
+
+# Emscripten build artifacts
+*.wasm
+*.js
+*.js.map
+*.mem
+*.wasm.map
+*.data
+
+# Native object and library files
+*.o
+*.obj
+*.lo
+*.la
+*.al
+*.a
+*.lib
+*.dll
+*.dylib
+*.so
+*.exe
+*.pdb
+
+# Temporary files
+*~
+*.swp
+*.swo
+*.tmp
+*.temp
+*.log
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Node
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+pnpm-lock.yaml
+
+# IDE / editor
+.vscode/
+.idea/
+*.code-workspace
+*.sublime-workspace
+*.sublime-project
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Coverage and profiling
+coverage/
+*.lcov
+
+# Generated docs
+docs/_build/
+
+tests/*.log

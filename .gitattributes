@@ -1,0 +1,18 @@
+* text=auto eol=lf
+
+*.wav binary
+*.flac binary
+*.mp3 binary
+*.ogg binary
+*.m4a binary
+*.aac binary
+*.aiff binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.wasm binary
+*.awc binary
+
+third_party/*.h -diff -text linguist-vendored
+third_party/*.c -diff -text linguist-vendored
+tests/fixtures/** -diff linguist-generated
