@@ -1,0 +1,143 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+env:
+  EMSDK_CACHE_KEY_FILE: .emscripten-version
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: clang-format --dry-run
+        run: |
+          sudo apt-get update && sudo apt-get install -y clang-format-16
+          find engine bindings tools tests -name '*.hpp' -o -name '*.cpp' | \
+            xargs clang-format-16 --dry-run --Werror -style=file
+      - name: Prettier check
+        working-directory: frontend
+        run: |
+          npm install --no-save prettier
+          npx prettier --check "src/**/*.ts" "workers/**/*.ts" "../bindings/wasm/**/*.ts"
+      - name: ESLint
+        working-directory: frontend
+        run: |
+          npm ci
+          npm run lint
+      - name: engine/ must not include emscripten.h
+        run: bash scripts/check-no-emscripten-include.sh
+
+  native:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: lukka/get-cmake@latest
+      - name: Configure (Debug, ASan/UBSan on Linux)
+        run: cmake --preset native-debug
+      - name: Build
+        run: cmake --build --preset native-debug
+      - name: Test
+        run: ctest --preset native-debug
+
+  tidy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: lukka/get-cmake@latest
+      - name: Configure
+        run: cmake --preset native-debug -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+      - name: clang-tidy over changed files
+        run: |
+          sudo apt-get update && sudo apt-get install -y clang-tidy-16
+          git fetch origin ${{ github.base_ref || 'main' }} --depth=1
+          changed=$(git diff --name-only origin/${{ github.base_ref || 'main' }}... -- 'engine/*.cpp' 'engine/*.hpp')
+          if [ -n "$changed" ]; then
+            echo "$changed" | xargs clang-tidy-16 -p build/native-debug
+          else
+            echo "no changed engine files"
+          fi
+
+  wasm:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Cache emsdk
+        id: emsdk-cache
+        uses: actions/cache@v4
+        with:
+          path: emsdk
+          key: emsdk-${{ hashFiles(env.EMSDK_CACHE_KEY_FILE) }}
+      - name: Install emsdk
+        run: |
+          if [ ! -d emsdk ]; then
+            git clone https://github.com/emscripten-core/emsdk.git
+          fi
+          cd emsdk
+          VERSION=$(cat ../.emscripten-version)
+          ./emsdk install "$VERSION"
+          ./emsdk activate "$VERSION"
+      - uses: lukka/get-cmake@latest
+      - name: Configure + build wasm-release
+        run: |
+          source emsdk/emsdk_env.sh
+          cmake --preset wasm-release
+          cmake --build --preset wasm-release
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Node integration tests
+        working-directory: tests/integration
+        run: |
+          npm ci
+          npm test
+      - name: Upload wasm artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: aud_wasm
+          path: build/wasm-release/bindings/wasm/aud_wasm.*
+
+  frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - working-directory: frontend
+        run: |
+          npm ci
+          npx tsc --noEmit
+          npx vitest run
+          npm run build
+
+  size:
+    needs: wasm
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: aud_wasm
+          path: build/wasm-release/bindings/wasm
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Report size
+        run: node scripts/size-report.mjs build/wasm-release/bindings/wasm/aud_wasm.wasm
+
+  bench:
+    if: false  # enabled in M22 once benchmark targets exist
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "placeholder — see M22"

@@ -8,7 +8,9 @@ add_library(aud_core STATIC
     util/allocator.cpp
     util/audio_buffer.cpp
     util/platform.cpp
+    util/diagnostics.cpp
 
+    decoder/decoder.cpp
     decoder/format_sniffer.cpp
     decoder/sample_convert.cpp
     decoder/wav_decoder.cpp
