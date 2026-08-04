@@ -4,6 +4,8 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
+    "build:wasm": "node ../scripts/build-wasm.mjs",
+    "build:wasm:debug": "node ../scripts/build-wasm.mjs --debug",
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview",

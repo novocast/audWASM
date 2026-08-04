@@ -16,12 +16,21 @@ std::size_t onRead(void* userData, void* out, std::size_t bytesToRead) {
 
 drflac_bool32 onSeek(void* userData, int offset, drflac_seek_origin origin) {
     auto* ring = static_cast<ByteRing*>(userData);
-    const std::size_t base   = (origin == DRFLAC_SEEK_SET) ? 0 : ring->cursor();
+    // DRFLAC_SEEK_END (used for end-of-stream metadata/length detection) must not fall through to
+    // the DRFLAC_SEEK_CUR case below — see the identical bug fixed in wav_decoder.cpp's onSeek.
+    const std::size_t base   = origin == DRFLAC_SEEK_SET   ? 0
+                                : origin == DRFLAC_SEEK_END ? ring->totalBytes()
+                                                             : ring->cursor();
     const auto         target = static_cast<std::int64_t>(base) + offset;
     if (target < 0) {
         return DRFLAC_FALSE;
     }
     return ring->seek(static_cast<std::size_t>(target)) ? DRFLAC_TRUE : DRFLAC_FALSE;
+}
+
+drflac_bool32 onTell(void* userData, drflac_int64* pCursor) {
+    *pCursor = static_cast<drflac_int64>(static_cast<ByteRing*>(userData)->cursor());
+    return DRFLAC_TRUE;
 }
 
 }  // namespace
@@ -40,7 +49,7 @@ FlacDecoder::~FlacDecoder() {
 
 Result<void> FlacDecoder::tryInit() {
     m_ring.seek(0);
-    m_impl->flac = drflac_open(onRead, onSeek, &m_ring, nullptr);
+    m_impl->flac = drflac_open(onRead, onSeek, onTell, &m_ring, nullptr);
     if (m_impl->flac != nullptr) {
         m_initialized = true;
         return Result<void>{};

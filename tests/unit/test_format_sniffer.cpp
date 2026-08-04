@@ -63,7 +63,7 @@ TEST_CASE("sniff skips a leading ID3v2 tag before re-sniffing", "[format_sniffer
 TEST_CASE("sniff rejects a video-brand MP4 with a clear UnsupportedFormat error", "[format_sniffer]") {
     // "ftyp" at offset 4, major brand "isom" would be treated as audio-capable in our conservative
     // allow-list, so use a brand that is NOT in it to exercise the Mp4Other path.
-    auto bytes  = bytesOf("\x00\x00\x00\x18ftypmp41", 12, 32);
+    auto bytes  = bytesOf("\x00\x00\x00\x18" "ftypmp41", 12, 32);
     auto result = sniff(bytes);
     REQUIRE(result.has_value());
     REQUIRE(result.value().format == ContainerFormat::Mp4Other);

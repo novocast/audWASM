@@ -105,6 +105,15 @@ public:
         return buffer == nullptr ? 0.0 : static_cast<double>(buffer->frameCount());
     }
 
+    // Opaque handle to the underlying aud::AudioBuffer, for TransportHandle::attachSource() (see
+    // playback_bindings.cpp). Deliberately a raw pointer-as-integer rather than a second Embind
+    // wrapper type: the AudioBuffer is non-owning here (DecodeSession keeps it alive) and this is
+    // purely a cross-binding-file handoff, the same "raw {ptr,length}/pointer for bulk data" pattern
+    // used everywhere else at this boundary (M01).
+    std::uintptr_t audioBufferHandle() const {
+        return reinterpret_cast<std::uintptr_t>(m_session.buffer());
+    }
+
     val getDiagnostics() {
         val    array = val::array();
         auto   diags = m_session.takeDiagnostics();
@@ -145,10 +154,11 @@ EMSCRIPTEN_BINDINGS(aud_core) {
     emscripten::function("selfTest", &bindings::selfTest);
 
     emscripten::class_<bindings::DecodeSessionHandle>("DecodeSession")
-        .smart_ptr_constructor("DecodeSession", &bindings::DecodeSessionHandle::create)
+        .class_function("create", &bindings::DecodeSessionHandle::create)
         .function("feedBytes", &bindings::DecodeSessionHandle::feedBytes)
         .function("finish", &bindings::DecodeSessionHandle::finish)
         .function("getStreamInfo", &bindings::DecodeSessionHandle::getStreamInfo)
         .function("getDecodedFrameCount", &bindings::DecodeSessionHandle::getDecodedFrameCount)
-        .function("getDiagnostics", &bindings::DecodeSessionHandle::getDiagnostics);
+        .function("getDiagnostics", &bindings::DecodeSessionHandle::getDiagnostics)
+        .function("audioBufferHandle", &bindings::DecodeSessionHandle::audioBufferHandle);
 }

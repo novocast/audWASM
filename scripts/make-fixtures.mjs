@@ -24,6 +24,10 @@ const SAMPLE_RATES = [44100, 48000, 96000];
 const BIT_DEPTHS = { wav: [16, 24, 32], flac: [16, 24] };
 const FORMATS = ['wav', 'flac', 'mp3', 'ogg'];
 
+// libmp3lame only accepts these rates (MPEG audio's fixed sample-rate table); asking it for
+// anything else, e.g. 96000, fails the encode outright rather than resampling.
+const MP3_SUPPORTED_RATES = new Set([8000, 11025, 12000, 16000, 22050, 24000, 32000, 44100, 48000]);
+
 // [name, ffmpeg -f lavfi filter]
 const SOURCES = [
   ['tone_1khz', 'sine=frequency=1000:duration=2'],
@@ -46,6 +50,10 @@ function main() {
     for (const [name, filterTemplate] of SOURCES) {
       const filter = filterTemplate.replace('{rate}', String(rate));
       for (const format of FORMATS) {
+        if (format === 'mp3' && !MP3_SUPPORTED_RATES.has(rate)) {
+          console.log(`skipping ${name}_${rate}hz.mp3 — libmp3lame does not support ${rate}Hz`);
+          continue;
+        }
         const depths = BIT_DEPTHS[format] ?? [null];
         for (const depth of depths) {
           const depthSuffix = depth ? `_${depth}bit` : '';

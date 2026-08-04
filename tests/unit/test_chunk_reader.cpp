@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <catch2/catch_test_macros.hpp>
 #include <random>
 #include <vector>
@@ -74,9 +75,8 @@ TEST_CASE("forEachWindow across chunk boundaries matches a naive monolithic impl
         std::size_t windowsChecked = 0;
         forEachWindow(buffer, 0, hop, size, scratch, [&](std::span<const Sample> window, aud::FrameIndex start) {
             REQUIRE(window.size() == size);
-            for (std::size_t i = 0; i < size; ++i) {
-                REQUIRE(window[i] == mono[static_cast<std::size_t>(start) + i]);
-            }
+            const auto* expected = mono.data() + static_cast<std::size_t>(start);
+            REQUIRE(std::equal(window.begin(), window.end(), expected));
             ++windowsChecked;
         });
 

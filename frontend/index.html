@@ -10,6 +10,29 @@
       <h1>audWASM</h1>
       <p id="status">Loading engine…</p>
       <dl id="build-info"></dl>
+
+      <section id="playback" hidden>
+        <h2>Playback (M03)</h2>
+        <input type="file" id="file-input" accept="audio/*" />
+        <p id="playback-status">Pick a file to enable audio.</p>
+        <div>
+          <button id="btn-play" type="button" disabled>Play</button>
+          <button id="btn-pause" type="button" disabled>Pause</button>
+          <label>
+            Seek
+            <input type="range" id="seek-slider" min="0" max="1" step="0.001" value="0" disabled />
+          </label>
+          <label>
+            Gain
+            <input type="range" id="gain-slider" min="0" max="1.5" step="0.01" value="1" />
+          </label>
+          <label>
+            <input type="checkbox" id="loop-toggle" /> Loop whole track
+          </label>
+        </div>
+        <p id="position-readout">0:00 / 0:00</p>
+        <canvas id="waveform-canvas" width="800" height="120" style="width: 100%; max-width: 800px; background: #111"></canvas>
+      </section>
     </div>
     <script type="module" src="/src/main.ts"></script>
   </body>

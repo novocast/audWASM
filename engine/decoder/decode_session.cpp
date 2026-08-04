@@ -2,6 +2,8 @@
 
 namespace aud::decoder {
 
+DecodeSession::~DecodeSession() = default;
+
 Result<DecodeSession> DecodeSession::create(std::span<const std::byte> probeBytes, Allocator& allocator) {
     AUD_TRY_ASSIGN(decoderPtr, createDecoder(probeBytes));
     return DecodeSession(std::move(decoderPtr), allocator);

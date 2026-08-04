@@ -2,6 +2,7 @@
 // regression fixtures get generated, and how the native-desktop-reuse story stays real. Every
 // analyser must be reachable from it (M01).
 
+#include <algorithm>
 #include <cstdio>
 #include <cstring>
 #include <fstream>
@@ -49,7 +50,10 @@ int runDecode(const char* path) {
         std::fprintf(stderr, "could not open '%s'\n", path);
         return 1;
     }
-    std::vector<std::byte> bytes(std::istreambuf_iterator<char>(file), (std::istreambuf_iterator<char>()));
+    std::vector<char>      rawBytes(std::istreambuf_iterator<char>(file), (std::istreambuf_iterator<char>()));
+    std::vector<std::byte> bytes(rawBytes.size());
+    std::transform(rawBytes.begin(), rawBytes.end(), bytes.begin(),
+                    [](char c) { return static_cast<std::byte>(c); });
 
     auto sessionResult = aud::decoder::DecodeSession::create(std::span<const std::byte>(bytes.data(), bytes.size()));
     if (!sessionResult.has_value()) {

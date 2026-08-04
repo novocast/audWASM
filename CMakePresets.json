@@ -66,6 +66,20 @@
         "AUD_BUILD_CLI": "OFF",
         "AUD_BUILD_WASM": "ON"
       }
+    },
+    {
+      "name": "wasm-test",
+      "displayName": "WASM Test (release + node in -sENVIRONMENT, for tests/integration only)",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/wasm-test",
+      "toolchainFile": "$env{EMSDK}/upstream/emscripten/cmake/Modules/Platform/Emscripten.cmake",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "AUD_BUILD_TESTS": "OFF",
+        "AUD_BUILD_CLI": "OFF",
+        "AUD_BUILD_WASM": "ON",
+        "AUD_WASM_FOR_NODE": "ON"
+      }
     }
   ],
   "buildPresets": [
@@ -73,7 +87,8 @@
     { "name": "native-release", "configurePreset": "native-release" },
     { "name": "wasm-debug", "configurePreset": "wasm-debug" },
     { "name": "wasm-profile", "configurePreset": "wasm-profile" },
-    { "name": "wasm-release", "configurePreset": "wasm-release" }
+    { "name": "wasm-release", "configurePreset": "wasm-release" },
+    { "name": "wasm-test", "configurePreset": "wasm-test" }
   ],
   "testPresets": [
     { "name": "native-debug", "configurePreset": "native-debug", "output": { "outputOnFailure": true } },

@@ -78,14 +78,21 @@ std::string hexDumpFirst16(std::span<const std::byte> bytes) {
 }  // namespace
 
 Result<SniffResult> sniff(std::span<const std::byte> bytes) {
-    std::size_t headerSkip = 0;
+    std::size_t headerSkip           = 0;
+    bool        tagLargerThanProbe   = false;
 
-    // ID3v2 header ("ID3") — skip the tag (syncsafe size) and re-sniff what follows.
+    // ID3v2 header ("ID3") — skip the tag (syncsafe size) and re-sniff what follows. Tags carrying
+    // embedded cover art routinely run into the megabytes (far past what a probe slice provides),
+    // in which case we cannot see past the tag yet: `bytes` is left untouched (still pointing at
+    // the tag's own binary payload) rather than subspan'd, and `tagLargerThanProbe` records that so
+    // the MPEG frame-sync scan below knows not to trust anything it finds in there (see its guard).
     if (matches(bytes, 0, "ID3") && bytes.size() >= 10) {
         const std::uint32_t tagSize = syncsafeToUint32(bytes.subspan(6, 4));
         headerSkip                  = 10 + tagSize;
         if (headerSkip < bytes.size()) {
             bytes = bytes.subspan(headerSkip);
+        } else {
+            tagLargerThanProbe = true;
         }
     }
 
@@ -117,6 +124,17 @@ Result<SniffResult> sniff(std::span<const std::byte> bytes) {
         }
         return SniffResult{recognisedAudio ? ContainerFormat::Mp4Aac : ContainerFormat::Mp4Other, headerSkip};
     }
+    // Scanning for MPEG frame-sync bytes inside an ID3v2 tag we couldn't skip past would be
+    // scanning the tag's own binary payload (cover art, etc.) — arbitrary binary data routinely
+    // contains byte sequences that pass the "3 consistent sync words" heuristic by chance, which
+    // would misidentify the file as MP3 based on noise rather than real audio frames. Safer to
+    // report "need more probe bytes" than to risk that false positive.
+    if (tagLargerThanProbe) {
+        return Error{ErrorCode::TruncatedData, "decoder.sniffer",
+                     "ID3v2 tag (likely embedded cover art) extends past the probe bytes; "
+                     "provide a larger probe slice"};
+    }
+
     if (looksLikeMp3(bytes)) {
         return SniffResult{ContainerFormat::Mp3, headerSkip};
     }

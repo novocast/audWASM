@@ -4,9 +4,11 @@
 /bin/
 /lib/
 /obj/
+/frontend/dist/
 
-# Local Docs
+# Local Docs and assets
 /documentation/
+/assets/*.mp3
 
 # CMake generated files
 CMakeCache.txt

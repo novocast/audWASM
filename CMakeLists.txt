@@ -24,6 +24,11 @@ option(AUD_ENABLE_SIMD       "Enable -msimd128 (wasm) / -mavx2 or NEON (native)"
 option(AUD_ENABLE_ASAN       "Enable ASan+UBSan (native only)"         OFF)
 option(AUD_ENABLE_PROFILING  "Enable instrumentation hooks (M22)"      OFF)
 option(AUD_WERROR            "Treat warnings as errors"                ON)
+# The shipped aud_wasm bundle targets web,worker only (see bindings/wasm/CMakeLists.txt);
+# the wasm-test preset flips this on so Node-based integration tests can load the same
+# Embind module via Emscripten's built-in Node fs fallback instead of a browser-only fetch.
+option(AUD_WASM_FOR_NODE     "Build aud_wasm with node added to -sENVIRONMENT (test-only)" OFF)
+option(AUD_BUILD_FUZZERS     "Build tests/fuzz targets (native only)"  ${AUD_TARGETING_WASM_OFF_DEFAULT})
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_CXX_STANDARD 20)
@@ -79,6 +84,10 @@ add_subdirectory(engine)
 if (AUD_BUILD_TESTS)
     enable_testing()
     add_subdirectory(tests)
+endif()
+
+if (AUD_BUILD_FUZZERS)
+    add_subdirectory(tests/fuzz)
 endif()
 
 if (AUD_BUILD_CLI)

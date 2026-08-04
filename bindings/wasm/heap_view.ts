@@ -3,7 +3,7 @@
 // can allocate invalidates every outstanding typed-array view; callers must re-acquire through
 // this module after such a call, never cache a raw view across one.
 
-import type { AudModule } from './engine.d.ts';
+import type { AudModule } from './aud_wasm.d.ts';
 
 let growthCounter = 0;
 

@@ -19,6 +19,13 @@ add_library(aud_core STATIC
     decoder/vorbis_decoder.cpp
     decoder/external_pcm_source.cpp
     decoder/decode_session.cpp
+
+    playback/resampler.cpp
+    playback/transport.cpp
+
+    waveform/reduce.cpp
+    waveform/waveform_analyzer.cpp
+    waveform/waveform_store.cpp
 )
 
 target_include_directories(aud_core PUBLIC

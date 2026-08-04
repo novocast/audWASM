@@ -32,6 +32,16 @@ public:
     DecodeSession(DecodeSession&&) noexcept        = default;
     DecodeSession& operator=(DecodeSession&&) noexcept = default;
 
+    // Declared out-of-line (defined in decode_session.cpp) rather than left implicit: an implicit
+    // destructor is defined inline wherever this header is included, so `delete`-ing m_decoder (a
+    // unique_ptr<Decoder>, Decoder being polymorphic) would compile under whatever -frtti setting
+    // that *consuming* TU happens to use. aud_core's own TUs build Decoder's hierarchy with
+    // -fno-rtti (M00 §2, kept PRIVATE so Catch2 in aud_tests can still use exceptions/RTTI), so a
+    // consumer TU without -fno-rtti inlining the delete is a cross-TU ABI mismatch on a polymorphic
+    // type — real UB, not a sanitizer false positive. Defining it here forces the delete to always
+    // happen inside aud_core's own consistently-flagged compilation.
+    ~DecodeSession();
+
     // `probeBytes` should be the first slice fed (>= a few KB; 64KB recommended per M02's sniffing
     // ladder). It is sniffed here but must also be passed to the first feed() call — this only
     // identifies the format, it does not consume the bytes.

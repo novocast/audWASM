@@ -15,6 +15,13 @@ add_executable(aud_tests
     unit/test_chunk_reader.cpp
     unit/test_sample_convert.cpp
     unit/test_format_sniffer.cpp
+    unit/test_decode_session.cpp
+    unit/test_ring_buffer.cpp
+    unit/test_resampler.cpp
+    unit/test_transport.cpp
+    unit/test_waveform_reduce.cpp
+    unit/test_waveform_analyzer.cpp
+    unit/test_waveform_store.cpp
 )
 
 target_link_libraries(aud_tests PRIVATE aud::core Catch2::Catch2WithMain)

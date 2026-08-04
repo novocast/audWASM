@@ -20,7 +20,15 @@ std::size_t onRead(void* userData, void* out, std::size_t bytesToRead) {
 
 drwav_bool32 onSeek(void* userData, int offset, drwav_seek_origin origin) {
     auto* ring = static_cast<ByteRing*>(userData);
-    const std::size_t base = (origin == DRWAV_SEEK_SET) ? 0 : ring->cursor();
+    // dr_wav uses SEEK_END (with offset 0) to sanity-check a declared data-chunk size against the
+    // actual stream length — mapping it onto CUR (the pre-existing bug here) reports the current
+    // parse cursor as "the end", which makes dr_wav believe the file is truncated and clamps
+    // totalPCMFrameCount/dataChunkSize down to whatever's already been consumed, i.e. 0 right after
+    // the header. totalBytes() is everything fed so far, which is the correct end-of-stream anchor
+    // once all bytes have arrived (the case this matters for: header + full data present at once).
+    const std::size_t base = origin == DRWAV_SEEK_SET   ? 0
+                              : origin == DRWAV_SEEK_END ? ring->totalBytes()
+                                                          : ring->cursor();
     const auto         target = static_cast<std::int64_t>(base) + offset;
     if (target < 0) {
         return DRWAV_FALSE;
@@ -50,7 +58,8 @@ WavDecoder::~WavDecoder() {
 Result<void> WavDecoder::tryInit() {
     m_ring.seek(0);
     if (drwav_init(&m_impl->wav, onRead, onSeek, onTell, &m_ring, nullptr)) {
-        m_initialized = true;
+        m_initialized         = true;
+        m_lastRingBytesAtInit = m_ring.totalBytes();
         return Result<void>{};
     }
     ++m_initAttempts;
@@ -60,12 +69,25 @@ Result<void> WavDecoder::tryInit() {
     return Result<void>{};  // not enough data yet — try again on the next feed()
 }
 
+Result<void> WavDecoder::refreshIfGrown() {
+    if (m_ring.totalBytes() == m_lastRingBytesAtInit) {
+        return Result<void>{};  // nothing new since the last (re-)init
+    }
+    drwav_uninit(&m_impl->wav);
+    m_initialized = false;
+    AUD_TRY(tryInit());
+    if (m_initialized && m_framesDelivered > 0) {
+        drwav_seek_to_pcm_frame(&m_impl->wav, m_framesDelivered);
+    }
+    return Result<void>{};
+}
+
 Result<void> WavDecoder::feed(std::span<const std::byte> bytes) {
     m_ring.feed(bytes.data(), bytes.size());
     if (!m_initialized) {
         return tryInit();
     }
-    return Result<void>{};
+    return refreshIfGrown();
 }
 
 Result<void> WavDecoder::signalEndOfInput() {
@@ -75,8 +97,9 @@ Result<void> WavDecoder::signalEndOfInput() {
         if (!m_initialized) {
             return Error{ErrorCode::TruncatedData, "decoder.wav", "end of input before a valid header was parsed"};
         }
+        return Result<void>{};
     }
-    return Result<void>{};
+    return refreshIfGrown();
 }
 
 Result<StreamInfo> WavDecoder::info() const {
@@ -118,6 +141,7 @@ Result<std::size_t> WavDecoder::read(std::span<std::span<Sample>> planarOut) {
         }
     }
 
+    m_framesDelivered += static_cast<std::uint64_t>(framesRead);
     return static_cast<std::size_t>(framesRead);
 }
 

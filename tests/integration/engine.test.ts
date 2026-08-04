@@ -1,16 +1,26 @@
 // Exercises the real built .wasm module under Node — not a mock — per M01's decision that native
-// and Node suites must diverge as little as possible. Expects `cmake --build --preset wasm-release`
-// to have already produced build/wasm-release/bindings/wasm/aud_wasm.js.
+// and Node suites must diverge as little as possible. The shipped wasm-release bundle targets
+// -sENVIRONMENT=web,worker only, so this uses the wasm-test preset instead, which adds node to
+// the environment list (see AUD_WASM_FOR_NODE in bindings/wasm/CMakeLists.txt). Expects
+// `cmake --build --preset wasm-test` to have already produced
+// build/wasm-test/bindings/wasm/aud_wasm.js.
 
-import { describe, expect, it } from 'vitest';
+import { beforeAll, describe, expect, it } from 'vitest';
 
-// @ts-expect-error — built artifact, not present until the wasm-release preset has been built.
-import createAudModule from '../../build/wasm-release/bindings/wasm/aud_wasm.js';
+// @ts-expect-error — built artifact, not present until the wasm-test preset has been built.
+import createAudModule from '../../build/wasm-test/bindings/wasm/aud_wasm.js';
 
 describe('aud_wasm Embind surface', () => {
-  it('reports a build info object and passes the engine self-test', async () => {
-    const module = await createAudModule();
+  // Embind's type registry is scoped to the generated JS module, not to a Module instance —
+  // calling createAudModule() more than once per process re-registers the same types and
+  // throws "Cannot register type twice". Instantiate once and share across tests.
+  let module: Awaited<ReturnType<typeof createAudModule>>;
 
+  beforeAll(async () => {
+    module = await createAudModule();
+  });
+
+  it('reports a build info object and passes the engine self-test', () => {
     const version = module.engineVersion();
     expect(version).toMatch(/^\d+\.\d+\.\d+$/);
 
@@ -22,9 +32,7 @@ describe('aud_wasm Embind surface', () => {
     expect(selfTest.pass).toBe(true);
   });
 
-  it('decodes a minimal in-memory WAV via DecodeSession', async () => {
-    const module = await createAudModule();
-
+  it('decodes a minimal in-memory WAV via DecodeSession', () => {
     // A tiny valid WAV: RIFF/WAVE, fmt chunk (PCM, mono, 8kHz, 16-bit), data chunk with 4 silent frames.
     const bytes = buildMinimalWav();
     const ptr = module._malloc(bytes.length);

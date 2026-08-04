@@ -7,7 +7,7 @@
 // Playback (M03) will feed its ring buffer from here directly.
 
 import { AudioEngine } from '../../bindings/wasm/engine.ts';
-import type { StreamInfo } from '../../bindings/wasm/engine.d.ts';
+import type { StreamInfo } from '../../bindings/wasm/aud_wasm.d.ts';
 
 interface StartMessage {
   type: 'start';
@@ -36,6 +36,11 @@ interface ErrorMessage {
 type OutboundMessage = ProgressMessage | DoneMessage | ErrorMessage;
 
 const READ_SLICE_BYTES = 256 * 1024; // M02: JS reads 256KB slices
+// The *first* slice doubles as the sniffer's probe: it must be large enough to see past an
+// ID3v2 tag in one shot, or the sniffer correctly refuses to guess rather than risk a false MP3
+// match on the tag's own binary payload (embedded cover art can run into several MB — see
+// format_sniffer.cpp / mp3_decoder.cpp's kMaxHeaderProbeBytes for the fuller story).
+const PROBE_SLICE_BYTES = 4 * 1024 * 1024;
 
 let enginePromise: Promise<AudioEngine> | null = null;
 
@@ -51,14 +56,14 @@ function post(message: OutboundMessage): void {
 async function decodeFile(file: Blob): Promise<void> {
   const engine = await getEngine();
 
-  const firstSlice = new Uint8Array(await file.slice(0, READ_SLICE_BYTES).arrayBuffer());
+  const firstSlice = new Uint8Array(await file.slice(0, PROBE_SLICE_BYTES).arrayBuffer());
   const session = engine.createDecodeSession(firstSlice);
   if (!session) {
-    post({ type: 'error', message: 'unrecognised or unsupported file format' });
+    post({ type: 'error', message: 'unrecognised or unsupported file format (or its ID3v2 tag is larger than the probe)' });
     return;
   }
 
-  let offset = READ_SLICE_BYTES;
+  let offset = firstSlice.length;
   session.feed(firstSlice);
 
   while (offset < file.size) {
