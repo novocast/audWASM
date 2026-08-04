@@ -1,11 +1,20 @@
-import { AudioEngine, type Waveform } from '../../bindings/wasm/engine.ts';
+import { AudioEngine, type DecodeSession, type Waveform } from '../../bindings/wasm/engine.ts';
 import { TransportClient, type TransportObservableState } from './playback/transportClient.ts';
 
-// Minimal Canvas2D waveform draw (the real renderer is M17) — just enough to prove the M04 data
-// is correct and to demonstrate progressive rendering: called again after every feed() so bins
-// appear on screen as chunks complete rather than only once decode finishes.
-function drawWaveform(canvas: HTMLCanvasElement, waveform: Waveform, decodedFrames: number): void {
-  if (decodedFrames <= 0) return;
+// A visible frame range, in source-track frames. `null` (used by callers, not stored here) means
+// "the whole decoded track so far" — auto-following progressive decode until the user zooms/pans.
+interface FrameRange {
+  start: number;
+  end: number;
+}
+
+// Minimal Canvas2D waveform draw (the real renderer is M17) — just enough to prove the M05
+// mipmap-pyramid query() is correct at every zoom level and to demonstrate progressive rendering:
+// called again after every feed() so bins appear on screen as chunks complete rather than only
+// once decode finishes.
+function drawWaveform(canvas: HTMLCanvasElement, waveform: Waveform, range: FrameRange): void {
+  const frames = range.end - range.start;
+  if (frames <= 0) return;
   const ctx = canvas.getContext('2d');
   if (!ctx) return;
   ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -13,9 +22,11 @@ function drawWaveform(canvas: HTMLCanvasElement, waveform: Waveform, decodedFram
   const channels = Math.max(1, Math.min(2, waveform.channelCount));
   const bandHeight = canvas.height / channels;
   const binCount = canvas.width;
-  const { bins } = waveform.query(0 /* PerChannel */, 0, decodedFrames, binCount);
+  const { bins, isRawPcm } = waveform.query(0 /* PerChannel */, range.start, range.end, binCount);
 
-  ctx.fillStyle = '#5fd3ff';
+  // M05 "Below level 0": once zoomed in past the pyramid's finest bin, the engine reduces raw PCM
+  // per pixel instead of aggregating mipmap bins — tint the trace to make the crossover visible.
+  ctx.fillStyle = isRawPcm ? '#ffb85f' : '#5fd3ff';
   for (let ch = 0; ch < channels; ch++) {
     const midY = bandHeight * ch + bandHeight / 2;
     const scale = bandHeight / 2;
@@ -26,6 +37,15 @@ function drawWaveform(canvas: HTMLCanvasElement, waveform: Waveform, decodedFram
       ctx.fillRect(i, Math.min(y1, y2), 1, Math.max(1, Math.abs(y2 - y1)));
     }
   }
+}
+
+// Keeps `range` within [0, totalFrames) and never lets a zoom collapse below a handful of frames
+// (a zero-width query is meaningless, and a single-frame one degenerates the raw-PCM fallback).
+function clampRange(start: number, end: number, totalFrames: number): FrameRange {
+  const kMinSpanFrames = 32;
+  const span = Math.min(Math.max(kMinSpanFrames, end - start), Math.max(totalFrames, kMinSpanFrames));
+  const clampedStart = Math.min(Math.max(start, 0), Math.max(totalFrames - span, 0));
+  return { start: clampedStart, end: clampedStart + span };
 }
 
 async function main(): Promise<void> {
@@ -81,7 +101,68 @@ function setupPlayback(engine: AudioEngine): void {
 
   let client: TransportClient | null = null;
   let waveform: Waveform | null = null;
+  let session: DecodeSession | null = null;
   let seeking = false;
+
+  // null = auto-follow the whole decoded-so-far track; set once the user zooms or pans (M05 demo:
+  // "zoom/pan interaction proving 60 fps").
+  let viewRange: FrameRange | null = null;
+
+  function redrawWaveform(): void {
+    if (!waveform || !session) return;
+    const totalFrames = Math.max(session.decodedFrameCount, 0);
+    const range = viewRange ?? { start: 0, end: totalFrames };
+    drawWaveform(waveformCanvas, waveform, range);
+  }
+
+  // Wheel-zoom around the cursor's frame position; drag-to-pan. Both just narrow/shift the frame
+  // range passed to query() — the pyramid picks whatever level fits, so this stays smooth (O(1) per
+  // frame) all the way from whole-track down to single-sample, per M05's acceptance criterion.
+  waveformCanvas.addEventListener('wheel', (event) => {
+    if (!session) return;
+    event.preventDefault();
+    const totalFrames = Math.max(session.decodedFrameCount, 0);
+    const current = viewRange ?? { start: 0, end: totalFrames };
+    const span = current.end - current.start;
+
+    const rect = waveformCanvas.getBoundingClientRect();
+    const fractionAcross = rect.width > 0 ? (event.clientX - rect.left) / rect.width : 0.5;
+    const pivotFrame = current.start + fractionAcross * span;
+
+    const zoomFactor = event.deltaY > 0 ? 1.25 : 1 / 1.25;
+    const newSpan = span * zoomFactor;
+    const newStart = pivotFrame - fractionAcross * newSpan;
+    viewRange = clampRange(newStart, newStart + newSpan, totalFrames);
+    redrawWaveform();
+  });
+
+  let dragOriginX = 0;
+  let dragOriginRange: FrameRange | null = null;
+  waveformCanvas.addEventListener('pointerdown', (event) => {
+    if (!session) return;
+    dragOriginX = event.clientX;
+    const totalFrames = Math.max(session.decodedFrameCount, 0);
+    dragOriginRange = viewRange ?? { start: 0, end: totalFrames };
+    waveformCanvas.setPointerCapture(event.pointerId);
+  });
+  waveformCanvas.addEventListener('pointermove', (event) => {
+    if (!dragOriginRange || !session) return;
+    const totalFrames = Math.max(session.decodedFrameCount, 0);
+    const rect = waveformCanvas.getBoundingClientRect();
+    const span = dragOriginRange.end - dragOriginRange.start;
+    const framesPerPixel = rect.width > 0 ? span / rect.width : 0;
+    const deltaFrames = (event.clientX - dragOriginX) * framesPerPixel;
+    viewRange = clampRange(dragOriginRange.start - deltaFrames, dragOriginRange.end - deltaFrames, totalFrames);
+    redrawWaveform();
+  });
+  waveformCanvas.addEventListener('pointerup', (event) => {
+    dragOriginRange = null;
+    waveformCanvas.releasePointerCapture(event.pointerId);
+  });
+  waveformCanvas.addEventListener('dblclick', () => {
+    viewRange = null;  // reset to whole-track view
+    redrawWaveform();
+  });
 
   function formatSeconds(seconds: number): string {
     const m = Math.floor(seconds / 60);
@@ -111,6 +192,8 @@ function setupPlayback(engine: AudioEngine): void {
       client = null;
       waveform?.dispose();
       waveform = null;
+      session = null;
+      viewRange = null;
       playbackStatus.textContent = 'Decoding…';
 
       // 4MB rather than a smaller "should be plenty" probe: real-world MP3s with an ID3v2 tag
@@ -119,46 +202,47 @@ function setupPlayback(engine: AudioEngine): void {
       // correctly refuses to guess rather than risk a false-positive match on the tag's own binary
       // image data (see format_sniffer.cpp).
       const probeSlice = new Uint8Array(await file.slice(0, 4 * 1024 * 1024).arrayBuffer());
-      const session = engine.createDecodeSession(probeSlice);
-      if (!session) {
+      const newSession = engine.createDecodeSession(probeSlice);
+      if (!newSession) {
         playbackStatus.textContent = 'Unrecognised or unsupported file format (or its ID3v2 tag is larger than the 4MB probe).';
         return;
       }
+      session = newSession;
 
       // Drives the waveform generator alongside decode (M04 "Streaming generation"): the
       // AudioBuffer only exists once the first frames land, so the Waveform handle is created
       // lazily on whichever step first sees a non-zero audioBufferHandle.
       const stepWaveform = (): void => {
         if (!waveform) {
-          const handle = session.audioBufferHandle;
+          const handle = newSession.audioBufferHandle;
           if (handle) waveform = engine.createWaveform(handle);
         }
         if (waveform) {
           waveform.processAvailableChunks();
-          drawWaveform(waveformCanvas, waveform, session.decodedFrameCount);
+          redrawWaveform();
         }
       };
 
-      session.feed(probeSlice);
+      newSession.feed(probeSlice);
       stepWaveform();
       let offset = probeSlice.length;
       while (offset < file.size) {
         const slice = new Uint8Array(await file.slice(offset, offset + 256 * 1024).arrayBuffer());
-        session.feed(slice);
+        newSession.feed(slice);
         offset += slice.length;
         stepWaveform();
       }
-      session.finish();
+      newSession.finish();
       waveform?.finish();
       stepWaveform();
 
-      const info = session.streamInfo;
+      const info = newSession.streamInfo;
       const audioContext = new AudioContext();
 
       client = await TransportClient.create({
         audioContext,
         engine,
-        decodeSession: session,
+        decodeSession: newSession,
         sourceSampleRate: info.sampleRate,
         channelCount: Math.max(1, Math.min(2, info.channels)), // demo UI renders up to stereo
         workletModuleUrl: new URL('./playback/worklet/audProcessor.ts', import.meta.url),
@@ -169,7 +253,7 @@ function setupPlayback(engine: AudioEngine): void {
       // Mp3Decoder::info()). Since this demo decodes the whole file synchronously before this
       // point (session.finish() already ran), session.decodedFrameCount is the exact total
       // regardless of what the codec's own metadata could report — no need to wait on that gap.
-      const durationFrames = info.frameCount >= 0 ? info.frameCount : session.decodedFrameCount;
+      const durationFrames = info.frameCount >= 0 ? info.frameCount : newSession.decodedFrameCount;
       client.load(durationFrames > 0 ? durationFrames : null);
 
       client.subscribe(render);

@@ -24,6 +24,7 @@ add_library(aud_core STATIC
     playback/transport.cpp
 
     waveform/reduce.cpp
+    waveform/pyramid.cpp
     waveform/waveform_analyzer.cpp
     waveform/waveform_store.cpp
 )

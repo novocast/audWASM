@@ -286,7 +286,7 @@ export class Waveform implements Disposable {
     rangeBeginFrame: number,
     rangeEndFrame: number,
     binCount: number,
-  ): { bins: WaveformBinsView; channels: number; framesPerBin: number; isComplete: boolean } {
+  ): { bins: WaveformBinsView; channels: number; framesPerBin: number; isComplete: boolean; isRawPcm: boolean } {
     const result = this.raw.query(channelsMode, rangeBeginFrame, rangeEndFrame, binCount);
     if (
       !result.ok ||
@@ -303,6 +303,7 @@ export class Waveform implements Disposable {
       channels: result.channels,
       framesPerBin: result.framesPerBin,
       isComplete: result.isComplete,
+      isRawPcm: result.isRawPcm ?? false,
     };
   }
 

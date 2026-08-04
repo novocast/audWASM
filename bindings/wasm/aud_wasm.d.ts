@@ -127,6 +127,9 @@ export interface WaveformQueryResult extends WaveformOperationResult {
   binCount?: number;
   framesPerBin?: number;
   isComplete?: boolean;
+  /** True if the requested resolution was finer than the pyramid's level 0, so the engine reduced
+   *  raw PCM directly rather than aggregating pyramid bins (M05 "Below level 0"). */
+  isRawPcm?: boolean;
 }
 
 /** Raw Embind handle. Prefer the Waveform wrapper in engine.ts. */

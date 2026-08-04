@@ -139,6 +139,7 @@ public:
         out.set("binCount", view.binCount);
         out.set("framesPerBin", view.framesPerBin);
         out.set("isComplete", view.isComplete);
+        out.set("isRawPcm", view.isRawPcm);
         return out;
     }
 

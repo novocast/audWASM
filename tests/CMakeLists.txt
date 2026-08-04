@@ -22,6 +22,7 @@ add_executable(aud_tests
     unit/test_waveform_reduce.cpp
     unit/test_waveform_analyzer.cpp
     unit/test_waveform_store.cpp
+    unit/test_waveform_pyramid.cpp
 )
 
 target_link_libraries(aud_tests PRIVATE aud::core Catch2::Catch2WithMain)
