@@ -15,5 +15,5 @@
     "noEmit": true,
     "types": ["vite/client"]
   },
-  "include": ["src", "workers", "../bindings/wasm"]
+  "include": ["src", "workers", "../bindings/wasm", "perf", "tests/e2e"]
 }

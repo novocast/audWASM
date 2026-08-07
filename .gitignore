@@ -5,6 +5,8 @@
 /lib/
 /obj/
 /frontend/dist/
+/frontend/test-results/
+/frontend/playwright-report/
 
 # Local Docs and assets
 /documentation/
@@ -84,3 +86,7 @@ coverage/
 docs/_build/
 
 tests/*.log
+tests/fixtures/ebu_loudness_test_set/
+# The zip itself, if downloaded straight into the repo root before unzipping — not redistributable
+# per the EBU's terms of use, and 87 MB is not something to ever commit either way.
+/ebu-loudness-test-setv05.zip

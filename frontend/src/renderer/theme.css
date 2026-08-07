@@ -1,0 +1,140 @@
+/*
+ * Light / dark / high-contrast theme tokens for the M17 renderer (theme.ts's `readThemeTokens`
+ * reads these `--aud-color-*` custom properties; see theme.ts's `kTokenVarNames`).
+ *
+ * M17 follow-up ("theme visual verification"): the demo previously had no stylesheet defining
+ * these at all, so `theme.ts`'s `prefers-color-scheme`/`prefers-contrast` wiring always fell
+ * through to its hardcoded dark fallback regardless of the OS setting. This file supplies all
+ * three themes plus a manual override (`[data-theme]` on `<html>`, driven by the demo page's
+ * "Theme" selector via `themeOverride.ts`) so every theme can actually be seen, not just implied.
+ *
+ * Precedence, low to high: dark defaults -> prefers-color-scheme: light -> prefers-contrast ->
+ * manual [data-theme] override (attribute selectors win on specificity over the plain :root/media
+ * rules above regardless of source order, so the manual toggle always has the final say).
+ */
+
+:root {
+  color-scheme: dark;
+
+  --aud-color-background: #17181c;
+  --aud-color-grid: rgba(255, 255, 255, 0.06);
+  --aud-color-ruler-text: rgb(191, 194, 204);
+  --aud-color-ruler-tick: rgba(255, 255, 255, 0.2);
+  --aud-color-waveform: rgb(94, 212, 255);
+  --aud-color-waveform-rms: rgba(94, 212, 255, 0.55);
+  --aud-color-waveform-raw-pcm: rgb(255, 184, 94);
+  --aud-color-selection-fill: rgba(94, 153, 255, 0.22);
+  --aud-color-selection-stroke: rgba(94, 153, 255, 0.8);
+  --aud-color-selection-handle: rgb(230, 237, 255);
+  --aud-color-cursor: rgba(255, 255, 255, 0.95);
+  --aud-color-clipping: rgb(255, 64, 64);
+  --aud-color-focus-ring: rgb(255, 204, 51);
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    color-scheme: light;
+
+    --aud-color-background: #f4f5f7;
+    --aud-color-grid: rgba(0, 0, 0, 0.08);
+    --aud-color-ruler-text: rgb(51, 54, 64);
+    --aud-color-ruler-tick: rgba(0, 0, 0, 0.25);
+    --aud-color-waveform: rgb(20, 110, 199);
+    --aud-color-waveform-rms: rgba(20, 110, 199, 0.5);
+    --aud-color-waveform-raw-pcm: rgb(198, 102, 15);
+    --aud-color-selection-fill: rgba(20, 110, 199, 0.16);
+    --aud-color-selection-stroke: rgba(20, 110, 199, 0.85);
+    --aud-color-selection-handle: rgb(20, 60, 110);
+    --aud-color-cursor: rgba(20, 20, 25, 0.9);
+    --aud-color-clipping: rgb(200, 30, 30);
+    --aud-color-focus-ring: rgb(180, 110, 0);
+  }
+}
+
+/* `prefers-contrast: more` and `: high` are both used in the wild (theme.ts's watchThemeChanges
+ * subscribes to both); treated identically here — one high-contrast theme, not two. Wins over the
+ * light/dark scheme above regardless of prefers-color-scheme, per M17 "Never encode information by
+ * colour alone" — this theme also maximises contrast, not just swaps a palette. */
+@media (prefers-contrast: more), (prefers-contrast: high) {
+  :root {
+    color-scheme: dark;
+
+    --aud-color-background: #000000;
+    --aud-color-grid: rgba(255, 255, 255, 0.35);
+    --aud-color-ruler-text: #ffffff;
+    --aud-color-ruler-tick: rgba(255, 255, 255, 0.6);
+    --aud-color-waveform: #00e5ff;
+    --aud-color-waveform-rms: rgba(0, 229, 255, 0.7);
+    --aud-color-waveform-raw-pcm: #ffb300;
+    --aud-color-selection-fill: rgba(255, 255, 0, 0.25);
+    --aud-color-selection-stroke: #ffff00;
+    --aud-color-selection-handle: #ffffff;
+    --aud-color-cursor: #ffffff;
+    --aud-color-clipping: #ff1a1a;
+    --aud-color-focus-ring: #ffff00;
+  }
+}
+
+/* Manual override (M17 tasks list precedent: "manual override for debugging" already exists for
+ * backend selection via backendSelection.ts; themeOverride.ts follows the same query-param +
+ * sticky-localStorage pattern). Lets every theme be visually confirmed without changing OS
+ * settings. */
+:root[data-theme='light'] {
+  color-scheme: light;
+  --aud-color-background: #f4f5f7;
+  --aud-color-grid: rgba(0, 0, 0, 0.08);
+  --aud-color-ruler-text: rgb(51, 54, 64);
+  --aud-color-ruler-tick: rgba(0, 0, 0, 0.25);
+  --aud-color-waveform: rgb(20, 110, 199);
+  --aud-color-waveform-rms: rgba(20, 110, 199, 0.5);
+  --aud-color-waveform-raw-pcm: rgb(198, 102, 15);
+  --aud-color-selection-fill: rgba(20, 110, 199, 0.16);
+  --aud-color-selection-stroke: rgba(20, 110, 199, 0.85);
+  --aud-color-selection-handle: rgb(20, 60, 110);
+  --aud-color-cursor: rgba(20, 20, 25, 0.9);
+  --aud-color-clipping: rgb(200, 30, 30);
+  --aud-color-focus-ring: rgb(180, 110, 0);
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --aud-color-background: #17181c;
+  --aud-color-grid: rgba(255, 255, 255, 0.06);
+  --aud-color-ruler-text: rgb(191, 194, 204);
+  --aud-color-ruler-tick: rgba(255, 255, 255, 0.2);
+  --aud-color-waveform: rgb(94, 212, 255);
+  --aud-color-waveform-rms: rgba(94, 212, 255, 0.55);
+  --aud-color-waveform-raw-pcm: rgb(255, 184, 94);
+  --aud-color-selection-fill: rgba(94, 153, 255, 0.22);
+  --aud-color-selection-stroke: rgba(94, 153, 255, 0.8);
+  --aud-color-selection-handle: rgb(230, 237, 255);
+  --aud-color-cursor: rgba(255, 255, 255, 0.95);
+  --aud-color-clipping: rgb(255, 64, 64);
+  --aud-color-focus-ring: rgb(255, 204, 51);
+}
+
+:root[data-theme='highContrast'] {
+  color-scheme: dark;
+  --aud-color-background: #000000;
+  --aud-color-grid: rgba(255, 255, 255, 0.35);
+  --aud-color-ruler-text: #ffffff;
+  --aud-color-ruler-tick: rgba(255, 255, 255, 0.6);
+  --aud-color-waveform: #00e5ff;
+  --aud-color-waveform-rms: rgba(0, 229, 255, 0.7);
+  --aud-color-waveform-raw-pcm: #ffb300;
+  --aud-color-selection-fill: rgba(255, 255, 0, 0.25);
+  --aud-color-selection-stroke: #ffff00;
+  --aud-color-selection-handle: #ffffff;
+  --aud-color-cursor: #ffffff;
+  --aud-color-clipping: #ff1a1a;
+  --aud-color-focus-ring: #ffff00;
+}
+
+body {
+  background: var(--aud-color-background);
+  color: var(--aud-color-ruler-text);
+}
+
+#waveform-container {
+  background: var(--aud-color-background);
+}

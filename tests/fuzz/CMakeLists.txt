@@ -5,9 +5,19 @@
 add_executable(decode_fuzzer decode_fuzzer.cpp)
 target_link_libraries(decode_fuzzer PRIVATE aud::core)
 
+# metadata_fuzzer — same split, over aud::metadata::extract() (M15's headline acceptance
+# criterion: 10M iterations across every tag parser with no crash/hang/OOM/ASan report).
+add_executable(metadata_fuzzer metadata_fuzzer.cpp)
+target_link_libraries(metadata_fuzzer PRIVATE aud::core)
+
 enable_testing()  # idempotent — AUD_BUILD_FUZZERS can be ON independently of AUD_BUILD_TESTS
 add_test(
     NAME decode_fuzzer_corpus_replay
     COMMAND decode_fuzzer "${CMAKE_SOURCE_DIR}/tests/fixtures"
+    WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
+)
+add_test(
+    NAME metadata_fuzzer_corpus_replay
+    COMMAND metadata_fuzzer "${CMAKE_SOURCE_DIR}/tests/fixtures"
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
 )

@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>audWASM renderer perf harness</title>
+    <link rel="stylesheet" href="/src/renderer/theme.css" />
+  </head>
+  <body>
+    <!--
+      M17 follow-up ("automated performance test"): a real playback scenario needs a real decoded
+      audio file, but the acceptance criterion this exercises — "60 fps sustained during playback
+      with waveform + all overlays, ... p99 frame time under 16.6 ms" — is a claim about the
+      render loop (RenderLoop/DirtyTracker/backends), not about decode. This harness drives the
+      actual production RenderLoop and Renderer against a synthetic 1-hour-duration view with a
+      fabricated (but non-trivial) waveform query, a live selection, markers, and hover feedback —
+      i.e. "all overlays on" — advancing a simulated playhead every frame, with no engine/decode
+      dependency. See perf.ts and tests/e2e/perf.spec.ts (the Playwright spec that reads
+      #perf-result and asserts p99Ms < 16.6).
+    -->
+    <div
+      id="waveform-container"
+      tabindex="0"
+      aria-label="Perf harness waveform viewer"
+      style="width: 900px; height: 300px; outline-offset: 2px"
+    ></div>
+    <pre id="perf-result">pending</pre>
+    <script type="module" src="/perf/perf.ts"></script>
+  </body>
+</html>

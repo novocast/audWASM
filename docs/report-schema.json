@@ -1,0 +1,104 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://audwasm.dev/schemas/report-schema.json",
+  "title": "audWASM statistics report",
+  "description": "M09's single-pass numeric summary of a file — peaks, RMS, distribution, dynamics, stereo relationship. Stable, versioned public artifact (see documentation/tasks/M09-audio-statistics.md): additive changes only within a major version of schemaVersion.",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "sampleRate",
+    "channelCount",
+    "frameCount",
+    "crestFactorDb",
+    "dynamicRangeDr",
+    "channels",
+    "stereo",
+    "rmsSeriesChannelCount",
+    "rmsSeries"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "type": "string",
+      "description": "Semver of this report shape. Major bump = breaking change; minor/patch are additive-only.",
+      "const": "1.0.0"
+    },
+    "sampleRate": { "type": "integer", "minimum": 0 },
+    "channelCount": { "type": "integer", "minimum": 0 },
+    "frameCount": { "type": "integer", "minimum": 0 },
+    "crestFactorDb": {
+      "type": "number",
+      "description": "Overall crest factor: 20*log10(peak/rms) across all channels combined. One of three deliberately distinct dynamics numbers — see dynamicRangeDr."
+    },
+    "dynamicRangeDr": {
+      "type": "number",
+      "description": "TT-style 'DR' convention (not a standard): mean, across channels, of 20*log10(mean peak / RMS-of-RMS) over each channel's loudest 20% of 3-second blocks. Loudness Range (LRA, EBU R128) is a separate, cross-linked measure from M08, not recomputed here."
+    },
+    "channels": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/channelStatistics" }
+    },
+    "stereo": {
+      "oneOf": [{ "$ref": "#/$defs/stereoStatistics" }, { "type": "null" }],
+      "description": "null unless channelCount == 2."
+    },
+    "rmsSeriesChannelCount": { "type": "integer", "minimum": 0 },
+    "rmsSeries": {
+      "type": "array",
+      "items": { "type": "number" },
+      "description": "50ms-resolution linear RMS, interleaved by channel: [ch0_w0, ch1_w0, ch0_w1, ch1_w1, ...]. Length is a multiple of rmsSeriesChannelCount."
+    }
+  },
+  "$defs": {
+    "channelStatistics": {
+      "type": "object",
+      "required": [
+        "peak", "peakDbfs", "peakFrame", "minValue", "maxValue", "dcOffset", "rms", "rmsDbfs",
+        "variance", "stdDev", "crestFactorDb", "zeroCrossingRate", "effectiveBitDepth",
+        "containerBitDepth", "ditherLikely", "ditherConfidence", "bitDepthDescription", "histogram"
+      ],
+      "properties": {
+        "peak": { "type": "number", "description": "max(abs(x)), linear." },
+        "peakDbfs": { "type": "number" },
+        "peakFrame": { "type": "integer", "description": "Frame index of the peak sample; -1 if the channel is silent." },
+        "minValue": { "type": "number" },
+        "maxValue": { "type": "number" },
+        "dcOffset": { "type": "number", "description": "mean(x) — feeds M12's DC offset detection." },
+        "rms": { "type": "number" },
+        "rmsDbfs": { "type": "number" },
+        "variance": { "type": "number" },
+        "stdDev": { "type": "number" },
+        "crestFactorDb": { "type": "number" },
+        "zeroCrossingRate": { "type": "number", "description": "Crossings per second." },
+        "effectiveBitDepth": {
+          "oneOf": [{ "type": "integer" }, { "type": "null" }],
+          "description": "null for a float source with no detected quantisation grid."
+        },
+        "containerBitDepth": { "type": "integer", "description": "0 for float sources." },
+        "ditherLikely": { "type": "boolean" },
+        "ditherConfidence": { "type": "number", "minimum": 0, "maximum": 1 },
+        "bitDepthDescription": { "type": "string", "description": "e.g. '24-bit container, 16-bit effective content'." },
+        "histogram": {
+          "type": "array",
+          "minItems": 1024,
+          "maxItems": 1024,
+          "items": { "type": "integer", "minimum": 0 },
+          "description": "1024-bucket amplitude distribution, symmetric around zero, linear range [-1, 1]."
+        }
+      }
+    },
+    "stereoStatistics": {
+      "type": "object",
+      "required": ["correlation", "balanceDb", "monoCompatibilityDb", "correlationSeries"],
+      "properties": {
+        "correlation": { "type": "number", "minimum": -1, "maximum": 1, "description": "Global Pearson r, DC removed." },
+        "balanceDb": { "type": "number", "description": "20*log10(rmsR / rmsL)." },
+        "monoCompatibilityDb": { "type": "number", "description": "Energy of (L+R)/2 vs mean energy of L and R, in dB; 0 = no loss summing to mono." },
+        "correlationSeries": {
+          "type": "array",
+          "items": { "type": "number", "minimum": -1, "maximum": 1 },
+          "description": "50ms-resolution correlation, for localising phase problems in time."
+        }
+      }
+    }
+  }
+}

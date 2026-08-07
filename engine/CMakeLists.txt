@@ -23,10 +23,73 @@ add_library(aud_core STATIC
     playback/resampler.cpp
     playback/transport.cpp
 
+    analysis/loudness/k_weighting.cpp
+    analysis/loudness/channel_weights.cpp
+    analysis/loudness/block_accumulator.cpp
+    analysis/loudness/gating.cpp
+    analysis/loudness/lra.cpp
+    analysis/loudness/true_peak.cpp
+    analysis/loudness/loudness_analyzer.cpp
+
+    analysis/statistics/bit_depth.cpp
+    analysis/statistics/stereo.cpp
+    analysis/statistics/dynamic_range.cpp
+    analysis/statistics/statistics_analyzer.cpp
+
+    analysis/silence/silence_detector.cpp
+    analysis/silence/boundary_refine.cpp
+
+    analysis/clipping/clip_detector.cpp
+    analysis/clipping/limiting_heuristic.cpp
+
+    analysis/dc/dc_analyzer.cpp
+
+    analysis/beats/odf.cpp
+    analysis/beats/whitening.cpp
+    analysis/beats/normalise.cpp
+    analysis/beats/peak_pick.cpp
+    analysis/beats/tempo.cpp
+    analysis/beats/beat_tracker.cpp
+    analysis/beats/beat_analyzer.cpp
+
+    analysis/transients/refine_timing.cpp
+    analysis/transients/features.cpp
+    analysis/transients/classifier.cpp
+    analysis/transients/click_detector.cpp
+    analysis/transients/dropout_detector.cpp
+    analysis/transients/transient_analyzer.cpp
+
+    fft/windows.cpp
+    fft/simd_kernels.cpp
+    fft/stft.cpp
+
     waveform/reduce.cpp
     waveform/pyramid.cpp
     waveform/waveform_analyzer.cpp
     waveform/waveform_store.cpp
+
+    spectrogram/frame_computer.cpp
+    spectrogram/freq_mapping.cpp
+    spectrogram/tile_generator.cpp
+    spectrogram/tile_cache.cpp
+    spectrogram/overview.cpp
+    spectrogram/point_query.cpp
+
+    metadata/metadata.cpp
+    metadata/tag_set.cpp
+    metadata/text_encoding.cpp
+    metadata/pictures.cpp
+    metadata/lyrics.cpp
+    metadata/cue.cpp
+    metadata/replaygain.cpp
+    metadata/id3v1.cpp
+    metadata/id3v2.cpp
+    metadata/apev2.cpp
+    metadata/vorbis_comment.cpp
+    metadata/riff.cpp
+    metadata/mp4/box_reader.cpp
+    metadata/mp4/ilst.cpp
+    metadata/metadata_extractor.cpp
 )
 
 target_include_directories(aud_core PUBLIC
@@ -61,6 +124,12 @@ add_library(aud::core ALIAS aud_core)
 add_subdirectory(analysis)
 add_subdirectory(fft)
 add_subdirectory(waveform)
+add_subdirectory(spectrogram)
 add_subdirectory(cache)
 add_subdirectory(metadata)
 add_subdirectory(playback)
+
+# aud_fft_pocketfft is defined inside fft/'s subdirectory (see fft/CMakeLists.txt for why it isn't
+# just another source in aud_core's list above); wire it in now that add_subdirectory(fft) above
+# has declared it.
+target_link_libraries(aud_core PRIVATE aud::fft_pocketfft)

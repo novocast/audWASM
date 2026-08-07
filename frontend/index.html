@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>audWASM</title>
+    <link rel="stylesheet" href="/src/renderer/theme.css" />
   </head>
   <body>
     <div id="app">
@@ -31,7 +32,111 @@
           </label>
         </div>
         <p id="position-readout">0:00 / 0:00</p>
-        <canvas id="waveform-canvas" width="800" height="120" style="width: 100%; max-width: 800px; background: #111"></canvas>
+
+        <h3>Renderer (M17)</h3>
+        <div>
+          <label>
+            Backend
+            <select id="renderer-backend">
+              <option value="auto">Auto</option>
+              <option value="webgl2">WebGL2</option>
+              <option value="canvas2d">Canvas2D</option>
+            </select>
+          </label>
+          <label>
+            Channels
+            <select id="renderer-channel-layout">
+              <option value="split">Split</option>
+              <option value="overlaid">Overlaid</option>
+              <option value="monoSum">Mono sum</option>
+              <option value="midSide">Mid/Side</option>
+            </select>
+          </label>
+          <label>
+            Amplitude
+            <select id="renderer-amplitude-scale">
+              <option value="linear">Linear</option>
+              <option value="db">dB</option>
+              <option value="root">Root</option>
+            </select>
+          </label>
+          <label>
+            Follow
+            <select id="renderer-follow-mode">
+              <option value="off">Off</option>
+              <option value="page">Page</option>
+              <option value="scroll">Scroll</option>
+              <option value="centre">Centre</option>
+            </select>
+          </label>
+          <label>
+            Theme
+            <select id="renderer-theme">
+              <option value="auto">Auto (OS)</option>
+              <option value="light">Light</option>
+              <option value="dark">Dark</option>
+              <option value="highContrast">High contrast</option>
+            </select>
+          </label>
+          <span id="renderer-backend-active"></span>
+          <span id="renderer-frame-stats"></span>
+        </div>
+
+        <h3>Spectrogram (M07)</h3>
+        <div>
+          <label>
+            Colour map
+            <select id="spectrogram-colormap">
+              <option value="viridis">Viridis</option>
+              <option value="magma">Magma</option>
+              <option value="inferno">Inferno</option>
+              <option value="greyscale">Greyscale</option>
+              <option value="classic">Classic (not perceptually uniform)</option>
+            </select>
+          </label>
+          <label>
+            Freq axis
+            <select id="spectrogram-freq-axis">
+              <option value="log">Log</option>
+              <option value="linear">Linear</option>
+              <option value="mel">Mel</option>
+              <option value="bark">Bark</option>
+            </select>
+          </label>
+          <label>
+            Floor dB
+            <input type="range" id="spectrogram-floor-db" min="-120" max="-20" step="1" value="-96" />
+          </label>
+          <label>
+            Gain dB
+            <input type="range" id="spectrogram-gain-db" min="-24" max="24" step="1" value="0" />
+          </label>
+          <label>
+            Gamma
+            <input type="range" id="spectrogram-gamma" min="0.2" max="3" step="0.05" value="1" />
+          </label>
+          <label>
+            Decimation
+            <select id="spectrogram-decimation">
+              <option value="max">Max</option>
+              <option value="mean">Mean</option>
+            </select>
+          </label>
+          <span id="spectrogram-cache-stats"></span>
+        </div>
+        <p id="spectrogram-readout">Hover the spectrogram for an exact frequency/level reading.</p>
+
+        <div
+          id="waveform-container"
+          tabindex="0"
+          aria-label="Waveform viewer"
+          style="width: 100%; max-width: 800px; height: 220px; outline-offset: 2px"
+        ></div>
+      </section>
+
+      <section id="metadata" hidden>
+        <h2>Metadata (M15)</h2>
+        <div id="metadata-content"></div>
       </section>
     </div>
     <script type="module" src="/src/main.ts"></script>

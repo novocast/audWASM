@@ -8,6 +8,7 @@
 
 #include <cstdint>
 #include <memory>
+#include <span>
 #include <string>
 
 #include "../../engine/decoder/decode_session.hpp"
@@ -105,6 +106,23 @@ public:
         return buffer == nullptr ? 0.0 : static_cast<double>(buffer->frameCount());
     }
 
+    // Copies decoded PCM for one channel into a caller-provided heap region — the seam the
+    // spectrogram worker (M07 "worker/PCM ownership") uses to get its own copy of the track (it
+    // can't share this DecodeSession's AudioBuffer across the worker boundary). `outPtr` must point
+    // at >= (endFrame-beginFrame) float32s already allocated in the WASM heap.
+    val readPlanarChannel(std::uint32_t channel, double beginFrame, double endFrame, std::uintptr_t outPtr) {
+        const auto* buffer = m_session.buffer();
+        if (buffer == nullptr) {
+            return errorToVal(aud::Error{aud::ErrorCode::InvalidArgument, "bindings.core", "no AudioBuffer yet"});
+        }
+        auto*      out    = reinterpret_cast<float*>(outPtr);
+        const auto begin  = static_cast<aud::FrameIndex>(beginFrame);
+        const auto end    = static_cast<aud::FrameIndex>(endFrame);
+        const auto count  = static_cast<std::size_t>(end - begin);
+        auto       result = buffer->read(channel, aud::FrameRange{begin, end}, std::span<aud::Sample>(out, count));
+        return errorToVal(result);
+    }
+
     // Opaque handle to the underlying aud::AudioBuffer, for TransportHandle::attachSource() (see
     // playback_bindings.cpp). Deliberately a raw pointer-as-integer rather than a second Embind
     // wrapper type: the AudioBuffer is non-owning here (DecodeSession keeps it alive) and this is
@@ -160,5 +178,6 @@ EMSCRIPTEN_BINDINGS(aud_core) {
         .function("getStreamInfo", &bindings::DecodeSessionHandle::getStreamInfo)
         .function("getDecodedFrameCount", &bindings::DecodeSessionHandle::getDecodedFrameCount)
         .function("getDiagnostics", &bindings::DecodeSessionHandle::getDiagnostics)
-        .function("audioBufferHandle", &bindings::DecodeSessionHandle::audioBufferHandle);
+        .function("audioBufferHandle", &bindings::DecodeSessionHandle::audioBufferHandle)
+        .function("readPlanarChannel", &bindings::DecodeSessionHandle::readPlanarChannel);
 }
