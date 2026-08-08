@@ -49,47 +49,47 @@ Result<void> deserializeLoudness(
 
     // integratedLufs
     auto il = reader.readDouble();
-    if (!il.ok) return Err(il.error);
-    result.integratedLufs = il.value;
+    if (!il.has_value()) return Err(il.error());
+    result.integratedLufs = il.value();
 
     // loudnessRangeLu
     auto lr = reader.readDouble();
-    if (!lr.ok) return Err(lr.error);
-    result.loudnessRangeLu = lr.value;
+    if (!lr.has_value()) return Err(lr.error());
+    result.loudnessRangeLu = lr.value();
 
     // truePeakDbtp
     auto tp = reader.readDouble();
-    if (!tp.ok) return Err(tp.error);
-    result.truePeakDbtp = tp.value;
+    if (!tp.has_value()) return Err(tp.error());
+    result.truePeakDbtp = tp.value();
 
     // samplePeakDbfs
     auto sp = reader.readDouble();
-    if (!sp.ok) return Err(sp.error);
-    result.samplePeakDbfs = sp.value;
+    if (!sp.has_value()) return Err(sp.error());
+    result.samplePeakDbfs = sp.value();
 
     // truePeakOversampling
     auto tpo = reader.readU32();
-    if (!tpo.ok) return Err(tpo.error);
-    result.truePeakOversampling = tpo.value;
+    if (!tpo.has_value()) return Err(tpo.error());
+    result.truePeakOversampling = tpo.value();
 
     // momentaryLufs
     auto mlCount = reader.readU32();
-    if (!mlCount.ok) return Err(mlCount.error);
-    auto ml = reader.readFloatArray(mlCount.value);
-    if (!ml.ok) return Err(ml.error);
-    result.momentaryLufs = ml.value;
+    if (!mlCount.has_value()) return Err(mlCount.error());
+    auto ml = reader.readFloatArray(mlCount.value());
+    if (!ml.has_value()) return Err(ml.error());
+    result.momentaryLufs = ml.value();
 
     // shortTermLufs
     auto stCount = reader.readU32();
-    if (!stCount.ok) return Err(stCount.error);
-    auto st = reader.readFloatArray(stCount.value);
-    if (!st.ok) return Err(st.error);
-    result.shortTermLufs = st.value;
+    if (!stCount.has_value()) return Err(stCount.error());
+    auto st = reader.readFloatArray(stCount.value());
+    if (!st.has_value()) return Err(st.error());
+    result.shortTermLufs = st.value();
 
     // usedFallbackChannelLayout
     auto ufcl = reader.readU8();
-    if (!ufcl.ok) return Err(ufcl.error);
-    result.usedFallbackChannelLayout = (ufcl.value != 0);
+    if (!ufcl.has_value()) return Err(ufcl.error());
+    result.usedFallbackChannelLayout = (ufcl.value() != 0);
 
     return Ok();
 }

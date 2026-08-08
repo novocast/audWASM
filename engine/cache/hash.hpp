@@ -32,13 +32,16 @@ public:
     // Finalize and return the digest. Call this once; subsequent calls return the same value.
     [[nodiscard]] Digest finish();
 
+    // Size of the opaque context buffer below. Public so hash.cpp can static_assert that whichever
+    // backing impl (real BLAKE3 or the fallback) fits inside it.
+    static constexpr size_t CONTEXT_SIZE = 64;
+
 private:
     // Opaque state for the BLAKE3 context.
     // With real BLAKE3, this would be a blake3_hasher struct (~200 bytes).
     // With fallback, this holds a FallbackBlake3Impl.
-    static constexpr size_t CONTEXT_SIZE = 64;
-    uint8_t                 m_context[CONTEXT_SIZE];
-    bool                    m_finalized = false;
+    uint8_t m_context[CONTEXT_SIZE];
+    bool    m_finalized = false;
 };
 
 // Compute BLAKE3 digest of a buffer in one shot.
@@ -61,11 +64,14 @@ public:
     // Finalize and return the digest.
     [[nodiscard]] Digest finish();
 
+    // Size of the opaque context buffer below. Public so hash.cpp can static_assert that whichever
+    // backing impl (real xxHash3 or the fallback) fits inside it.
+    static constexpr size_t CONTEXT_SIZE = 64;
+
 private:
     // Opaque state for the xxHash3 context.
-    static constexpr size_t CONTEXT_SIZE = 64;
-    uint8_t                 m_context[CONTEXT_SIZE];
-    bool                    m_finalized = false;
+    uint8_t m_context[CONTEXT_SIZE];
+    bool    m_finalized = false;
 };
 
 // Compute xxHash3 digest of a buffer in one shot.

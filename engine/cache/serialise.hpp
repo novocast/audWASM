@@ -150,8 +150,8 @@ public:
     // Read an i32, little-endian.
     Result<int32_t> readI32() {
         auto u = readU32();
-        if (!u.ok) return Err(u.error);
-        return static_cast<int32_t>(u.value);
+        if (!u.has_value()) return Err(u.error());
+        return static_cast<int32_t>(u.value());
     }
 
     // Read a u64, little-endian, bounds-checked.
@@ -174,25 +174,25 @@ public:
     // Read an i64, little-endian.
     Result<int64_t> readI64() {
         auto u = readU64();
-        if (!u.ok) return Err(u.error);
-        return static_cast<int64_t>(u.value);
+        if (!u.has_value()) return Err(u.error());
+        return static_cast<int64_t>(u.value());
     }
 
     // Read a float (IEEE 754), little-endian.
     Result<float> readFloat() {
         auto bits = readU32();
-        if (!bits.ok) return Err(bits.error);
+        if (!bits.has_value()) return Err(bits.error());
         float value;
-        std::memcpy(&value, &bits.value, sizeof(bits.value));
+        std::memcpy(&value, &bits.value(), sizeof(bits.value()));
         return value;
     }
 
     // Read a double (IEEE 754), little-endian.
     Result<double> readDouble() {
         auto bits = readU64();
-        if (!bits.ok) return Err(bits.error);
+        if (!bits.has_value()) return Err(bits.error());
         double value;
-        std::memcpy(&value, &bits.value, sizeof(bits.value));
+        std::memcpy(&value, &bits.value(), sizeof(bits.value()));
         return value;
     }
 
@@ -202,8 +202,8 @@ public:
         values.reserve(count);
         for (size_t i = 0; i < count; ++i) {
             auto v = readFloat();
-            if (!v.ok) return Err(v.error);
-            values.push_back(v.value);
+            if (!v.has_value()) return Err(v.error());
+            values.push_back(v.value());
         }
         return values;
     }
@@ -214,8 +214,8 @@ public:
         values.reserve(count);
         for (size_t i = 0; i < count; ++i) {
             auto v = readDouble();
-            if (!v.ok) return Err(v.error);
-            values.push_back(v.value);
+            if (!v.has_value()) return Err(v.error());
+            values.push_back(v.value());
         }
         return values;
     }
@@ -223,14 +223,14 @@ public:
     // Read a string with u32 length prefix.
     Result<std::string> readString() {
         auto len = readU32();
-        if (!len.ok) return Err(len.error);
+        if (!len.has_value()) return Err(len.error());
 
-        if (m_offset + len.value > m_payload.size()) {
+        if (m_offset + len.value() > m_payload.size()) {
             return Err("PayloadReader: out-of-bounds read (string)");
         }
 
-        std::string result(reinterpret_cast<const char*>(m_payload.data() + m_offset), len.value);
-        m_offset += len.value;
+        std::string result(reinterpret_cast<const char*>(m_payload.data() + m_offset), len.value());
+        m_offset += len.value();
         return result;
     }
 

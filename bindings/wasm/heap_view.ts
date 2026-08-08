@@ -57,6 +57,16 @@ export function float64View(module: AudModule, ptr: number, lengthInDoubles: num
   return module.HEAPF64.subarray(ptr / 8, ptr / 8 + lengthInDoubles);
 }
 
+/** Copies `doubles` into a freshly `_malloc`'d heap region and returns { ptr, length }. Caller must
+ *  `Module._free(ptr)` once the native side is done reading it (Transients.create()'s onset-time
+ *  handoff — see M13/M14's HEAPF64 onset-times convention). */
+export function copyFloat64IntoHeap(module: AudModule, doubles: Float64Array): { ptr: number; length: number } {
+  const ptr = module._malloc(doubles.length * 8);
+  module.HEAPF64.set(doubles, ptr / 8);
+  noteGrowthBoundary();
+  return { ptr, length: doubles.length };
+}
+
 /** Zero-copy Uint32 view of a heap region (M09 statistics' per-channel histogram, a
  *  std::array<uint32_t, 1024> on the engine side). Same growth-boundary discipline as float32View. */
 export function uint32View(module: AudModule, ptr: number, lengthInU32: number): Uint32Array {

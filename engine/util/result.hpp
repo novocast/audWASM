@@ -138,6 +138,24 @@ private:
     bool  m_hasValue = true;
 };
 
+// Convenience helpers for the early-return style used by the cache module: `Err(...)` builds
+// an Error (from a message or by forwarding one already in hand) that converts implicitly to
+// any Result<T>; `Ok(...)` builds the corresponding success value/void Result explicitly.
+inline Error Err(std::string message) {
+    return Error(ErrorCode::Unknown, "cache", std::move(message));
+}
+inline Error Err(Error error) {
+    return error;
+}
+
+inline Result<void> Ok() {
+    return Result<void>();
+}
+template <class T>
+Result<std::remove_cvref_t<T>> Ok(T&& value) {
+    return Result<std::remove_cvref_t<T>>(std::forward<T>(value));
+}
+
 }  // namespace aud
 
 // Early-return helper. `expr` must be a Result<T> prvalue or named Result<T> lvalue reference.

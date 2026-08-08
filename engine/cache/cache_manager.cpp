@@ -45,13 +45,13 @@ CacheValidationResult CacheManager::validateCache(
 
     // Try to open and read header
     auto reader = AwcReader::open(cachePath);
-    if (!reader.ok) {
+    if (!reader.has_value()) {
         return result;  // isValid = false
     }
 
     // Validate source hash and size
-    if (reader.value.header().sourceHash != expectedSourceHash ||
-        reader.value.header().sourceSize != expectedSourceSize) {
+    if (reader.value().header().sourceHash != expectedSourceHash ||
+        reader.value().header().sourceSize != expectedSourceSize) {
         return result;  // Cache mismatch
     }
 
@@ -59,7 +59,7 @@ CacheValidationResult CacheManager::validateCache(
     result.isValid = true;
     result.sourceHash = expectedSourceHash;
     result.handle = CacheHandle{};
-    result.handle->m_reader = std::make_shared<AwcReader>(std::move(reader.value));
+    result.handle->m_reader = std::make_shared<AwcReader>(std::move(reader.value()));
 
     return result;
 }

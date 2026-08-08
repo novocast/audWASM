@@ -45,36 +45,36 @@ Result<void> deserializeWaveformPyramid(
 
     // formatVersion
     auto fv = reader.readU32();
-    if (!fv.ok) return Err(fv.error);
-    if (fv.value != 1) {
-        return Err("Unsupported waveform pyramid format: " + std::to_string(fv.value));
+    if (!fv.has_value()) return Err(fv.error());
+    if (fv.value() != 1) {
+        return Err("Unsupported waveform pyramid format: " + std::to_string(fv.value()));
     }
 
     // channelCount
     auto channelCount = reader.readU32();
-    if (!channelCount.ok) return Err(channelCount.error);
+    if (!channelCount.has_value()) return Err(channelCount.error());
 
     // Reset the store with the channel count
-    store.reset(static_cast<aud::ChannelIndex>(channelCount.value));
+    store.reset(static_cast<aud::ChannelIndex>(channelCount.value()));
 
     // For each channel, read and restore the level-0 bins
-    for (aud::ChannelIndex ch = 0; ch < static_cast<aud::ChannelIndex>(channelCount.value); ++ch) {
+    for (aud::ChannelIndex ch = 0; ch < static_cast<aud::ChannelIndex>(channelCount.value()); ++ch) {
         auto binCount = reader.readU32();
-        if (!binCount.ok) return Err(binCount.error);
+        if (!binCount.has_value()) return Err(binCount.error());
 
         // Read all bins for this channel
         std::vector<aud::Sample> chunkSamples;
-        chunkSamples.reserve(binCount.value * aud::waveform::kBaseBinFrames);
+        chunkSamples.reserve(binCount.value() * aud::waveform::kBaseBinFrames);
 
-        for (uint32_t i = 0; i < binCount.value; ++i) {
+        for (uint32_t i = 0; i < binCount.value(); ++i) {
             auto minVal = reader.readFloat();
-            if (!minVal.ok) return Err(minVal.error);
+            if (!minVal.has_value()) return Err(minVal.error());
             auto maxVal = reader.readFloat();
-            if (!maxVal.ok) return Err(maxVal.error);
+            if (!maxVal.has_value()) return Err(maxVal.error());
             auto rmsVal = reader.readFloat();
-            if (!rmsVal.ok) return Err(rmsVal.error);
+            if (!rmsVal.has_value()) return Err(rmsVal.error());
             auto peakVal = reader.readFloat();
-            if (!peakVal.ok) return Err(peakVal.error);
+            if (!peakVal.has_value()) return Err(peakVal.error());
 
             // Reconstruct level-0 bins into samples
             // Note: this is a reconstruction from bins, not the original PCM.

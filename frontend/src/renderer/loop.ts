@@ -6,7 +6,7 @@
 // Deliberately does not import bindings/wasm/engine.ts — `queryWaveform` is supplied by the
 // caller so this module (and its tests) never need a WASM module instance.
 
-import type { Renderer, RenderFrame, WaveformQueryResult, MarkerLike, SelectionRange, SpectrogramSource } from './renderer.ts';
+import type { Renderer, RenderFrame, WaveformQueryResult, MarkerLike, SelectionRange, SpectrogramSource, OverlayFrameData } from './renderer.ts';
 import type { ThemeTokens } from './theme.ts';
 import { readThemeTokens, watchThemeChanges } from './theme.ts';
 import { watchDevicePixelRatio } from './dprWatcher.ts';
@@ -27,6 +27,10 @@ export interface RenderLoopOptions {
   queryWaveform(view: import('./viewState.ts').ViewState, binCountDevicePx: number): WaveformQueryResult | null;
   getSelection(): SelectionRange | null;
   getMarkers(): readonly MarkerLike[];
+  /** M18's overlay data (marker store view, lane config, curve series, selection highlight). Null
+   *  (the default when omitted) until the host wires up an overlays store — the 'overlays' layer
+   *  then just clears itself each frame, same as before M18 landed. */
+  getOverlayFrame?(): OverlayFrameData | null;
   /** Null until the spectrogram worker has loaded PCM for the current track (M07). Reads the tile
    *  manager's current state — does not itself trigger tile requests (the caller's tile manager
    *  does that from its own per-frame update, driven by `invalidateSpectrogram`'s trigger point). */
@@ -107,6 +111,12 @@ export class RenderLoop {
     this.opts.renderer.dirty.markDirty('selection');
   }
 
+  /** New/changed markers, a lane reorder/collapse/resize, or a new inspector selection — anything
+   *  that changes what the overlays layer should draw next frame without the view itself moving. */
+  invalidateOverlays(): void {
+    this.opts.renderer.dirty.markDirty('overlays');
+  }
+
   /** New tiles arrived, or the visible set changed — the spectrogram worker's `tile`/`overview`
    *  messages and the tile manager's own per-frame viewport recompute both funnel through this. */
   invalidateSpectrogram(): void {
@@ -161,6 +171,9 @@ export class RenderLoop {
       // needs to redraw when new decode data arrives with no view change at all).
       opts.renderer.dirty.markDirty('background');
       opts.renderer.dirty.markDirty('selection');
+      // A view change (pan/zoom) also moves every marker/lane pixel position, same reasoning as
+      // the ruler/selection above.
+      opts.renderer.dirty.markDirty('overlays');
       // A view change (pan/zoom) changes which tiles are visible — the tile manager itself
       // recomputes on its own per-frame tick, but the *draw* needs to happen this frame too, not
       // just whenever the next tile happens to arrive.
@@ -186,6 +199,7 @@ export class RenderLoop {
       isPlaying,
       selection: opts.getSelection(),
       markers: opts.getMarkers(),
+      overlays: opts.getOverlayFrame?.() ?? null,
       theme: this.theme,
       spectrogram: opts.getSpectrogramSource?.() ?? null,
     };

@@ -32,6 +32,7 @@
           </label>
         </div>
         <p id="position-readout">0:00 / 0:00</p>
+        <p id="analysis-summary" class="aud-analysis-summary"></p>
 
         <h3>Renderer (M17)</h3>
         <div>
@@ -126,12 +127,25 @@
         </div>
         <p id="spectrogram-readout">Hover the spectrogram for an exact frequency/level reading.</p>
 
-        <div
-          id="waveform-container"
-          tabindex="0"
-          aria-label="Waveform viewer"
-          style="width: 100%; max-width: 800px; height: 220px; outline-offset: 2px"
-        ></div>
+        <h3>Findings (M18)</h3>
+        <div id="aud-lane-toggles" class="aud-lane-toggles"></div>
+        <div class="aud-timeline-row">
+          <div
+            id="waveform-container"
+            tabindex="0"
+            aria-label="Waveform viewer"
+            style="height: 220px; outline-offset: 2px"
+          ></div>
+          <aside id="aud-sidebar" class="aud-sidebar" aria-label="Findings and inspector">
+            <div id="findings-panel-host"></div>
+            <div id="inspector-panel-host"></div>
+          </aside>
+        </div>
+      </section>
+
+      <section id="statistics" hidden>
+        <h2>Statistics (M09)</h2>
+        <div id="statistics-content"></div>
       </section>
 
       <section id="metadata" hidden>

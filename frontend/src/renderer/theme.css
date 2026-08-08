@@ -137,4 +137,203 @@ body {
 
 #waveform-container {
   background: var(--aud-color-background);
+  flex: 1 1 480px;
+  min-width: 0;
+}
+
+/* M18/M20 findings/inspector wiring — a thin, token-driven layer over the plain-DOM panels in
+ * overlays/findingsPanel.ts and overlays/inspectorPanel.ts (previously unstyled: neither was
+ * mounted anywhere before this pass). Kept minimal, matching the rest of this demo page's
+ * utilitarian style rather than attempting a redesign. */
+
+.aud-analysis-summary {
+  font-size: 0.9em;
+  color: var(--aud-color-ruler-text);
+  opacity: 0.9;
+}
+
+.aud-lane-toggles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75em;
+  font-size: 0.85em;
+  margin-bottom: 0.5em;
+}
+
+.aud-timeline-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75em;
+  align-items: flex-start;
+}
+
+.aud-sidebar {
+  flex: 0 1 320px;
+  min-width: 260px;
+  max-width: 360px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75em;
+  max-height: 480px;
+}
+
+.aud-findings-panel,
+.aud-inspector-panel {
+  border: 1px solid var(--aud-color-grid);
+  border-radius: 4px;
+  padding: 0.5em;
+  overflow-y: auto;
+}
+
+.aud-findings-panel {
+  flex: 1 1 auto;
+  min-height: 160px;
+}
+
+.aud-findings-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4em;
+  margin-bottom: 0.5em;
+}
+
+.aud-findings-toolbar select,
+.aud-findings-toolbar button {
+  font-size: 0.8em;
+}
+
+.aud-findings-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.aud-findings-row {
+  display: flex;
+  gap: 0.5em;
+  padding: 0.2em 0.4em;
+  font-size: 0.85em;
+  cursor: pointer;
+  border-radius: 2px;
+}
+
+.aud-findings-row:hover {
+  background: var(--aud-color-grid);
+}
+
+.aud-findings-row--selected {
+  background: var(--aud-color-selection-fill);
+  outline: 1px solid var(--aud-color-focus-ring);
+}
+
+.aud-findings-row--error {
+  color: var(--aud-color-clipping);
+}
+
+.aud-findings-kind {
+  flex: 0 0 6em;
+  opacity: 0.75;
+  text-transform: uppercase;
+  font-size: 0.85em;
+}
+
+.aud-findings-time {
+  flex: 0 0 4.5em;
+  font-variant-numeric: tabular-nums;
+}
+
+.aud-findings-label {
+  flex: 1 1 auto;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.aud-findings-empty,
+.aud-inspector-empty {
+  opacity: 0.7;
+  font-size: 0.85em;
+  padding: 0.5em 0;
+}
+
+.aud-findings-capped {
+  opacity: 0.7;
+  font-size: 0.8em;
+  padding: 0.4em 0;
+  font-style: italic;
+}
+
+.aud-inspector-title {
+  font-size: 0.9em;
+  margin: 0 0 0.4em;
+  word-break: break-all;
+}
+
+.aud-inspector-row {
+  display: flex;
+  gap: 0.5em;
+  font-size: 0.85em;
+  padding: 0.1em 0;
+}
+
+.aud-inspector-label {
+  flex: 0 0 6em;
+  opacity: 0.75;
+}
+
+.aud-inspector-value {
+  flex: 1 1 auto;
+}
+
+.aud-inspector-data {
+  font-size: 0.75em;
+  max-height: 8em;
+  overflow: auto;
+  background: var(--aud-color-grid);
+  padding: 0.4em;
+  border-radius: 3px;
+}
+
+.aud-inspector-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4em;
+  margin-top: 0.5em;
+}
+
+.aud-inspector-actions button {
+  font-size: 0.8em;
+}
+
+.statistics-fields {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 1.5em;
+  margin: 0 0 0.5em;
+}
+
+.statistics-field {
+  display: flex;
+  gap: 0.4em;
+  font-size: 0.9em;
+}
+
+.statistics-field dt {
+  opacity: 0.75;
+}
+
+.statistics-field dd {
+  margin: 0;
+}
+
+.statistics-channels {
+  font-size: 0.85em;
+  border-collapse: collapse;
+}
+
+.statistics-channels th,
+.statistics-channels td {
+  padding: 0.2em 0.6em;
+  text-align: left;
+  border-bottom: 1px solid var(--aud-color-grid);
 }

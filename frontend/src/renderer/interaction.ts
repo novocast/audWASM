@@ -31,6 +31,11 @@ export interface InteractionCallbacks {
   onTogglePlay(): void;
   onReCentre(): void;
   formatHoverLabel?(frame: number): string;
+  /** A genuine click (no drag past the threshold) on the waveform itself — not the ruler/scrub
+   *  strip. Fires alongside onSeek/onSelectionChange at the same point, so a host that wants
+   *  click-to-select-a-marker (M18) doesn't need its own separate pointer tracking to distinguish
+   *  a click from a drag; `pixelX` is CSS-pixel, relative to `el`. */
+  onClick?(pixelX: number): void;
 }
 
 export interface InteractionOptions {
@@ -212,6 +217,7 @@ export function attachInteraction(el: HTMLElement, opts: InteractionOptions, cb:
       const frame = frameAtClientX(cb.getView(), event.clientX);
       cb.onSeek(frame);
       cb.onSelectionChange(null);
+      if (pointer.role === 'select') cb.onClick?.(clientXToPixel(event.clientX));
     }
 
     if (pointer.role === 'pinch') {

@@ -1,0 +1,130 @@
+- generic [ref=e2]:
+  - heading "audWASM" [level=1] [ref=e3]
+  - paragraph [ref=e4]: "Engine self-test: PASS"
+  - generic [ref=e5]:
+    - term [ref=e6]: version
+    - definition [ref=e7]: 0.1.0
+    - term [ref=e8]: simd
+    - definition [ref=e9]: "true"
+    - term [ref=e10]: threads
+    - definition [ref=e11]: "false"
+    - term [ref=e12]: optimisation
+    - definition [ref=e13]: Release
+  - generic [ref=e14]:
+    - heading "Playback (M03)" [level=2] [ref=e15]
+    - button "Choose File" [ref=e16]
+    - paragraph [ref=e17]: Pick a file to enable audio.
+    - generic [ref=e18]:
+      - button "Play" [disabled] [ref=e19]
+      - button "Pause" [disabled] [ref=e20]
+      - generic [ref=e21]:
+        - text: Seek
+        - slider "Seek" [disabled] [ref=e22]: "0"
+      - generic [ref=e23]:
+        - text: Gain
+        - slider "Gain" [ref=e24]: "1"
+      - generic [ref=e25]:
+        - checkbox "Loop whole track" [ref=e26]
+        - text: Loop whole track
+    - paragraph [ref=e27]: 0:00 / 0:00
+    - paragraph
+    - heading "Renderer (M17)" [level=3] [ref=e28]
+    - generic [ref=e29]:
+      - generic [ref=e30]:
+        - text: Backend
+        - combobox "Backend" [ref=e31]:
+          - option "Auto" [selected]
+          - option "WebGL2"
+          - option "Canvas2D"
+      - generic [ref=e32]:
+        - text: Channels
+        - combobox "Channels" [ref=e33]:
+          - option "Split" [selected]
+          - option "Overlaid"
+          - option "Mono sum"
+          - option "Mid/Side"
+      - generic [ref=e34]:
+        - text: Amplitude
+        - combobox "Amplitude" [ref=e35]:
+          - option "Linear" [selected]
+          - option "dB"
+          - option "Root"
+      - generic [ref=e36]:
+        - text: Follow
+        - combobox "Follow" [ref=e37]:
+          - option "Off" [selected]
+          - option "Page"
+          - option "Scroll"
+          - option "Centre"
+      - generic [ref=e38]:
+        - text: Theme
+        - combobox "Theme" [ref=e39]:
+          - option "Auto (OS)" [selected]
+          - option "Light"
+          - option "Dark"
+          - option "High contrast"
+      - text: "active: webgl2 avg 77.05ms p99 131.50ms"
+    - heading "Spectrogram (M07)" [level=3] [ref=e40]
+    - generic [ref=e41]:
+      - generic [ref=e42]:
+        - text: Colour map
+        - combobox "Colour map" [ref=e43]:
+          - option "Viridis" [selected]
+          - option "Magma"
+          - option "Inferno"
+          - option "Greyscale"
+          - option "Classic (not perceptually uniform)"
+      - generic [ref=e44]:
+        - text: Freq axis
+        - combobox "Freq axis" [ref=e45]:
+          - option "Log" [selected]
+          - option "Linear"
+          - option "Mel"
+          - option "Bark"
+      - generic [ref=e46]:
+        - text: Floor dB
+        - slider "Floor dB" [ref=e47]: "-96"
+      - generic [ref=e48]:
+        - text: Gain dB
+        - slider "Gain dB" [ref=e49]: "0"
+      - generic [ref=e50]:
+        - text: Gamma
+        - slider "Gamma" [ref=e51]: "1"
+      - generic [ref=e52]:
+        - text: Decimation
+        - combobox "Decimation" [ref=e53]:
+          - option "Max" [selected]
+          - option "Mean"
+    - paragraph [ref=e54]: Hover the spectrogram for an exact frequency/level reading.
+    - heading "Findings (M18)" [level=3] [ref=e55]
+    - generic [ref=e56]:
+      - generic [ref=e57]:
+        - checkbox "Chapters / cue points" [checked] [ref=e58]
+        - text: Chapters / cue points
+      - generic [ref=e59]:
+        - checkbox "Beats / bars" [checked] [ref=e60]
+        - text: Beats / bars
+      - generic [ref=e61]:
+        - checkbox "Loudness" [checked] [ref=e62]
+        - text: Loudness
+      - generic [ref=e63]:
+        - checkbox "Transients / defects" [checked] [ref=e64]
+        - text: Transients / defects
+      - generic [ref=e65]:
+        - checkbox "Lyrics" [ref=e66]
+        - text: Lyrics
+      - generic [ref=e67]:
+        - checkbox "Errors / decoder events" [checked] [ref=e68]
+        - text: Errors / decoder events
+    - generic [ref=e69]:
+      - img "Waveform viewer" [ref=e70]
+      - complementary "Findings and inspector" [ref=e72]:
+        - generic [ref=e74]:
+          - generic [ref=e75]:
+            - combobox [ref=e76]:
+              - option "All kinds (0)"
+            - 'button "Sort: time" [ref=e77]'
+            - 'button "Sort: kind" [ref=e78]'
+            - 'button "Sort: severity" [ref=e79]'
+          - generic [ref=e81]: No findings.
+        - generic [ref=e84]: No marker selected.

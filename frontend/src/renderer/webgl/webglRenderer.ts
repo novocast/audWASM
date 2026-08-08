@@ -8,7 +8,9 @@ import { DirtyTracker, type Layer, type Renderer, type RenderFrame, type RenderS
 import type { ThemeTokens } from '../theme.ts';
 import { drawBackgroundLayer, drawRulers } from '../canvas2d/backgroundLayer.ts';
 import { drawSelectionLayer } from '../canvas2d/selectionLayer.ts';
+import { drawOverlaysLayer } from '../overlays/drawOverlays.ts';
 import type { TimeRulerUnits } from '../canvas2d/rulerLayer.ts';
+import type { HitCandidate } from '../../overlays/hitTest.ts';
 import { watchContextLoss } from './glUtil.ts';
 import { WaveformProgram } from './waveformProgram.ts';
 import { SpectrogramProgram } from '../spectrogram/program.ts';
@@ -26,6 +28,7 @@ export class WebglRenderer implements Renderer {
   private spectrogramProgram: SpectrogramProgram | null = null;
   private unwatchContextLoss: (() => void) | null = null;
   private contextLost = false;
+  private lastHitCandidates: HitCandidate[] = [];
   private widthCss = 0;
   private heightCss = 0;
   private devicePixelRatio = 1;
@@ -104,6 +107,10 @@ export class WebglRenderer implements Renderer {
     this.dirty.markAllDirty();
   }
 
+  hitCandidates(): readonly HitCandidate[] {
+    return this.lastHitCandidates;
+  }
+
   render(frame: RenderFrame): RenderStats {
     const t0 = performance.now();
     const dpr = this.devicePixelRatio;
@@ -120,6 +127,7 @@ export class WebglRenderer implements Renderer {
     const backgroundWasDirty = this.dirty.consumeDirty('background');
     const spectrogramWasDirty = this.dirty.consumeDirty('spectrogram');
     const waveformWasDirty = this.dirty.consumeDirty('waveform');
+    let backgroundRedrawnAlready = false;
     if (
       !this.contextLost &&
       this.gl &&
@@ -137,25 +145,29 @@ export class WebglRenderer implements Renderer {
         envelope: [t.waveformFill.r, t.waveformFill.g, t.waveformFill.b, t.waveformFill.a],
         rms: [t.waveformRms.r, t.waveformRms.g, t.waveformRms.b, t.waveformRms.a],
       });
-      if (backgroundWasDirty) layersRedrawn.push('background');
+      if (backgroundWasDirty) {
+        layersRedrawn.push('background');
+        backgroundRedrawnAlready = true;
+      }
       if (spectrogramWasDirty) layersRedrawn.push('spectrogram');
       if (waveformWasDirty) layersRedrawn.push('waveform');
     }
 
-    let overlayTouched = false;
-    if (backgroundWasDirty) {
+    // Rulers, the selection rectangle, and M18's overlays layer all share this single 2D canvas
+    // (unlike Canvas2DRenderer, which stacks one canvas per layer) — so whichever of the three is
+    // dirty forces a full clear+redraw of *all three*, or the clear would erase the other two's
+    // already-drawn pixels without anything re-painting them this frame.
+    const selectionWasDirty = this.dirty.consumeDirty('selection');
+    const overlaysWasDirty = this.dirty.consumeDirty('overlays');
+    if (backgroundWasDirty || selectionWasDirty || overlaysWasDirty) {
       this.overlayCtx.clearRect(0, 0, dw, dh);
       // GL canvas paints the background fill; the 2D overlay only adds ticks/labels on top.
       drawRulers(this.overlayCtx, frame, dw, dh, this.timeRulerUnits, dpr);
-      overlayTouched = true;
-    }
-    if (this.dirty.consumeDirty('selection')) {
-      if (!overlayTouched) this.overlayCtx.clearRect(0, 0, dw, dh);
       drawSelectionLayer(this.overlayCtx, frame, dh, dpr);
-      layersRedrawn.push('selection');
-    }
-    if (this.dirty.consumeDirty('overlays')) {
-      layersRedrawn.push('overlays'); // M18 territory; nothing to draw yet.
+      this.lastHitCandidates = drawOverlaysLayer(this.overlayCtx, frame, dw, dh, dpr).hitCandidates;
+      if (backgroundWasDirty && !backgroundRedrawnAlready) layersRedrawn.push('background');
+      if (selectionWasDirty) layersRedrawn.push('selection');
+      if (overlaysWasDirty) layersRedrawn.push('overlays');
     }
 
     if (this.contextLost) {

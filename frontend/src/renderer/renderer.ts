@@ -5,6 +5,9 @@
 
 import type { AmplitudeScale, ChannelLayout, ViewLimits, ViewState } from './viewState.ts';
 import type { ThemeTokens } from './theme.ts';
+import type { CurveKind, CurveSeries, Marker, OverlayKind } from '../overlays/model.ts';
+import type { LaneConfig } from '../overlays/lanes.ts';
+import type { HitCandidate } from '../overlays/hitTest.ts';
 
 /** Bottom-to-top compositing order (M17 "Layered scene model"). Layers 5-6 always render on the
  *  dedicated Canvas2D overlay (see playheadOverlay.ts); 0-4 render on the main backend surface. */
@@ -86,11 +89,34 @@ export interface SelectionRange {
 }
 
 /** Placeholder shape for M18 overlays/markers — M17 only needs enough to reserve layer 4 and
- *  leave a real seam; M18 owns the actual model. */
+ *  leave a real seam; M18 owns the actual model. Retained (rather than removed) because
+ *  interaction.ts's double-click-to-select-between-markers gesture only needs `{id, frame}` and
+ *  predates the full `Marker` model — kept decoupled from overlays/model.ts so interaction.ts
+ *  doesn't need to import the whole overlays module for two fields. */
 export interface MarkerLike {
   id: string;
   frame: number;
   label?: string;
+}
+
+/** Minimal structural view of a MarkerStore (overlays/store.ts) — the renderer only ever reads
+ *  per-kind arrays, never mutates, so it depends on this rather than the concrete class (same
+ *  discipline as `WaveformBinsLike` above: draw code stays testable without constructing a real
+ *  store). */
+export interface OverlayMarkerSource {
+  get(kind: OverlayKind): readonly Marker[];
+}
+
+/** What M18's overlays layer needs each frame, on top of `RenderFrame.markers` above. Null until
+ *  a track/analysis session exists — the draw layer just clears in that case, same as any other
+ *  not-yet-loaded layer. */
+export interface OverlayFrameData {
+  markers: OverlayMarkerSource;
+  lanes: readonly LaneConfig[];
+  curves: Partial<Record<CurveKind, CurveSeries>>;
+  /** The marker currently selected in the inspector/findings list, if any — drawn with a highlight
+   *  ring so clicking a findings-list row visibly connects to its position on the timeline. */
+  selectedMarkerId: string | null;
 }
 
 /** Identifies one spectrogram tile — mirrors engine/spectrogram/tile.hpp's TileKey minus
@@ -145,6 +171,9 @@ export interface RenderFrame {
   isPlaying: boolean;
   selection: SelectionRange | null;
   markers: readonly MarkerLike[];
+  /** Null until M18 overlay wiring is attached (e.g. in an M17-only test harness) — see
+   *  OverlayFrameData's own doc comment. */
+  overlays: OverlayFrameData | null;
   theme: ThemeTokens;
   /** Null until the spectrogram worker has loaded PCM for the current track (M07). */
   spectrogram: SpectrogramSource | null;
@@ -182,6 +211,11 @@ export interface Renderer {
   resize(widthCss: number, heightCss: number, devicePixelRatio: number): void;
   setTheme(theme: ThemeTokens): void;
   render(frame: RenderFrame): RenderStats;
+  /** Hit-test candidates built by the most recent render()'s overlays-layer pass (M18) — both
+   *  backends already compute these while drawing; exposed so the interaction layer can hit-test
+   *  a click against them without recomputing density from scratch. Empty before the first
+   *  render() with a non-null `overlays` frame. */
+  hitCandidates(): readonly HitCandidate[];
   /** Releases GPU/canvas resources. The Renderer must not be used again after this. */
   dispose(): void;
 }

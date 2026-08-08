@@ -14,7 +14,7 @@ namespace aud::cache {
 Result<AwcReader> AwcReader::open(const std::filesystem::path& path) {
     AwcReader reader(path);
     auto res = reader.loadHeaderAndDirectory();
-    if (!res.ok) return Err(res.error);
+    if (!res.has_value()) return Err(res.error());
     return reader;
 }
 
@@ -44,72 +44,72 @@ Result<void> AwcReader::loadHeaderAndDirectory() {
 
     // magic
     auto magic = hdr.readBytes(4);
-    if (!magic.ok) return Err(magic.error);
-    if (magic.value[0] != 'A' || magic.value[1] != 'W' ||
-        magic.value[2] != 'C' || magic.value[3] != '1') {
+    if (!magic.has_value()) return Err(magic.error());
+    if (magic.value()[0] != 'A' || magic.value()[1] != 'W' ||
+        magic.value()[2] != 'C' || magic.value()[3] != '1') {
         return Err("Invalid magic");
     }
 
     // formatVersion
     auto fv = hdr.readU16();
-    if (!fv.ok) return Err(fv.error);
-    if (fv.value != 1) {
-        return Err("Unsupported format version: " + std::to_string(fv.value));
+    if (!fv.has_value()) return Err(fv.error());
+    if (fv.value() != 1) {
+        return Err("Unsupported format version: " + std::to_string(fv.value()));
     }
 
     // headerSize
     auto hs = hdr.readU16();
-    if (!hs.ok) return Err(hs.error);
-    if (hs.value != 80) {
-        return Err("Unexpected header size: " + std::to_string(hs.value));
+    if (!hs.has_value()) return Err(hs.error());
+    if (hs.value() != 80) {
+        return Err("Unexpected header size: " + std::to_string(hs.value()));
     }
 
     // flags
     auto flags = hdr.readU32();
-    if (!flags.ok) return Err(flags.error);
+    if (!flags.has_value()) return Err(flags.error());
     // Ignore flags for now; if bit 0 is set, it would indicate compression
 
     // engineVersion
     auto ev = hdr.readU32();
-    if (!ev.ok) return Err(ev.error);
-    m_header.engineVersion = ev.value;
+    if (!ev.has_value()) return Err(ev.error());
+    m_header.engineVersion = ev.value();
 
     // sourceHash
     auto hash = hdr.readBytes(32);
-    if (!hash.ok) return Err(hash.error);
-    if (hash.value.size() != 32) {
+    if (!hash.has_value()) return Err(hash.error());
+    if (hash.value().size() != 32) {
         return Err("Invalid source hash size");
     }
-    std::copy(hash.value.begin(), hash.value.end(), m_header.sourceHash.begin());
+    std::copy(hash.value().begin(), hash.value().end(), m_header.sourceHash.begin());
 
     // sourceSize
     auto ss = hdr.readU64();
-    if (!ss.ok) return Err(ss.error);
-    m_header.sourceSize = ss.value;
+    if (!ss.has_value()) return Err(ss.error());
+    m_header.sourceSize = ss.value();
 
     // sampleRate
     auto sr = hdr.readU32();
-    if (!sr.ok) return Err(sr.error);
-    m_header.sampleRate = sr.value;
+    if (!sr.has_value()) return Err(sr.error());
+    m_header.sampleRate = sr.value();
 
     // channels
     auto ch = hdr.readU32();
-    if (!ch.ok) return Err(ch.error);
-    m_header.channels = ch.value;
+    if (!ch.has_value()) return Err(ch.error());
+    m_header.channels = ch.value();
 
     // frameCount
     auto fc = hdr.readI64();
-    if (!fc.ok) return Err(fc.error);
-    m_header.frameCount = fc.value;
+    if (!fc.has_value()) return Err(fc.error());
+    m_header.frameCount = fc.value();
 
     // chunkCount
     auto cc = hdr.readU32();
-    if (!cc.ok) return Err(cc.error);
-    m_header.chunkCount = cc.value;
+    if (!cc.has_value()) return Err(cc.error());
+    m_header.chunkCount = cc.value();
 
     // reserved
     auto res = hdr.readU32();
-    if (!res.ok) return Err(res.error);
+    if (!res.has_value()) return Err(res.error());
 
     // Now read the chunk directory
     // The directory starts after all chunk payloads.
@@ -155,8 +155,8 @@ Result<void> AwcReader::loadHeaderAndDirectory() {
         PayloadReader entry(entryBuf);
 
         auto type = entry.readU32();
-        if (!type.ok) return Err(type.error);
-        uint32_t t = type.value;
+        if (!type.has_value()) return Err(type.error());
+        uint32_t t = type.value();
         std::array<char, 4> typeStr;
         typeStr[0] = static_cast<char>(t & 0xFF);
         typeStr[1] = static_cast<char>((t >> 8) & 0xFF);
@@ -164,31 +164,31 @@ Result<void> AwcReader::loadHeaderAndDirectory() {
         typeStr[3] = static_cast<char>((t >> 24) & 0xFF);
 
         auto av = entry.readU32();
-        if (!av.ok) return Err(av.error);
+        if (!av.has_value()) return Err(av.error());
 
         auto ph = entry.readU64();
-        if (!ph.ok) return Err(ph.error);
+        if (!ph.has_value()) return Err(ph.error());
 
         auto off = entry.readU64();
-        if (!off.ok) return Err(off.error);
+        if (!off.has_value()) return Err(off.error());
 
         auto ss = entry.readU64();
-        if (!ss.ok) return Err(ss.error);
+        if (!ss.has_value()) return Err(ss.error());
 
         auto rs = entry.readU64();
-        if (!rs.ok) return Err(rs.error);
+        if (!rs.has_value()) return Err(rs.error());
 
         auto chk = entry.readU64();
-        if (!chk.ok) return Err(chk.error);
+        if (!chk.has_value()) return Err(chk.error());
 
         m_chunks.push_back(ChunkInfo{
             .type = typeStr,
-            .analyzerVersion = av.value,
-            .paramsHash = ph.value,
-            .offset = off.value,
-            .storedSize = ss.value,
-            .rawSize = rs.value,
-            .checksum = chk.value,
+            .analyzerVersion = av.value(),
+            .paramsHash = ph.value(),
+            .offset = off.value(),
+            .storedSize = ss.value(),
+            .rawSize = rs.value(),
+            .checksum = chk.value(),
         });
     }
 
@@ -244,10 +244,10 @@ Result<std::vector<std::vector<uint8_t>>> AwcReader::loadChunksOfType(std::strin
             chunk.type[2] == type[2] && chunk.type[3] == type[3]) {
 
             auto payload = loadChunk(type);
-            if (payload.ok) {
-                results.push_back(payload.value);
+            if (payload.has_value()) {
+                results.push_back(payload.value());
             } else {
-                return Err(payload.error);
+                return Err(payload.error());
             }
         }
     }

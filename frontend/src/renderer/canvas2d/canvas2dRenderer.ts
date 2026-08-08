@@ -12,6 +12,7 @@ import type { ThemeTokens } from '../theme.ts';
 import { drawBackgroundLayer, drawRulers } from './backgroundLayer.ts';
 import { drawWaveformLayer } from './waveformLayer.ts';
 import { drawSelectionLayer } from './selectionLayer.ts';
+import { drawOverlaysLayer } from '../overlays/drawOverlays.ts';
 import type { TimeRulerUnits } from './rulerLayer.ts';
 
 const kCanvasLayers: readonly Layer[] = ['background', 'waveform', 'selection', 'overlays'];
@@ -28,6 +29,13 @@ export class Canvas2DRenderer implements Renderer {
   private devicePixelRatio = 1;
   private theme: ThemeTokens | null = null;
   timeRulerUnits: TimeRulerUnits = 'time';
+  /** Hit candidates from the most recent overlays redraw — interaction.ts's click handler reads
+   *  this via `hitCandidates()` rather than recomputing density itself. */
+  private lastHitCandidates: import('../../overlays/hitTest.ts').HitCandidate[] = [];
+
+  hitCandidates(): readonly import('../../overlays/hitTest.ts').HitCandidate[] {
+    return this.lastHitCandidates;
+  }
 
   attach(container: HTMLElement): void {
     this.container = container;
@@ -96,7 +104,7 @@ export class Canvas2DRenderer implements Renderer {
     if (this.dirty.consumeDirty('overlays')) {
       const ctx = this.contexts.get('overlays')!;
       ctx.clearRect(0, 0, dw, dh);
-      // M18 owns marker rendering; M17 just clears the layer so it never shows stale content.
+      this.lastHitCandidates = drawOverlaysLayer(ctx, frame, dw, dh, dpr).hitCandidates;
       layersRedrawn.push('overlays');
     }
 

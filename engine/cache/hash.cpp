@@ -14,9 +14,10 @@
 // These are not cryptographically strong and should only be used for development.
 // Production builds MUST use the real BLAKE3 and xxHash3 implementations.
 
-#if !defined(AUDWASM_WITH_BLAKE3) || !defined(AUDWASM_WITH_XXHASH3)
-#warning "M16: Using fallback hash implementations. Vendor blake3.h and xxhash.h for production."
-#endif
+// NOTE(M16): when AUDWASM_WITH_BLAKE3/AUDWASM_WITH_XXHASH3 are not defined, the fallback hash
+// implementations below are used. They are NOT cryptographically strong — vendor blake3.h and
+// xxhash.h for production. (Not a #warning/#pragma message: this build treats all diagnostics as
+// errors via -Werror, which would make an informational note fail the build.)
 
 namespace aud::cache {
 

@@ -4,13 +4,20 @@
 import createAudModule from './aud_wasm.js';
 import type {
   AudModule,
+  Beat,
+  BeatOnset,
+  ClipEventResult,
   CreateAudModuleOptions,
+  DcChannelResult,
   DecodeDiagnostic,
   EngineBuildInfo,
   FftSpectrumScaling,
   FftWindowType,
   MetadataResult,
   OperationResult,
+  RawBeatsHandle,
+  RawClippingHandle,
+  RawDcHandle,
   RawDecodeSessionHandle,
   RawLoudnessHandle,
   RawMetadataHandle,
@@ -19,6 +26,7 @@ import type {
   RawSpectrogramHandle,
   RawStatisticsHandle,
   RawStftHandle,
+  RawTransientsHandle,
   RawTransportHandle,
   RawTransportState,
   RawWaveformHandle,
@@ -27,10 +35,13 @@ import type {
   SpectrogramDecimation,
   SpectrogramFreqAxis,
   StreamInfo,
+  TempoCandidateResult,
+  Transient,
   WaveformChannelSelector,
 } from './aud_wasm.d.ts';
 import {
   copyFloat32IntoHeap,
+  copyFloat64IntoHeap,
   copyIntoHeap,
   copyPointerArrayIntoHeap,
   float32View,
@@ -1102,6 +1113,411 @@ export class Silence implements Disposable {
   }
 }
 
+export interface ClippingConfigureParams {
+  minRunSamples?: number;
+  nearClipDbfs?: number;
+  nearClipMinRun?: number;
+  flatnessToleranceDb?: number;
+  mergeGapSamples?: number;
+  ispOversampling?: number;
+  detectInterSamplePeaks?: boolean;
+  maxStoredEvents?: number;
+}
+
+export interface ClippingResult {
+  totalClippedSamples: number;
+  clippedFraction: number;
+  maxOvershootDb: number;
+  flatTopRatio: number;
+  meanPlateauLength: number;
+  heavyLimitingLikely: boolean;
+  containerBitDepth: number;
+  reportJson: string;
+  /** Uncapped, indexed by ClipKind — always show these even once `events` is capped. */
+  eventCount: [number, number, number, number];
+  events: ClipEventResult[];
+  /** True if `events.length` is less than the sum of `eventCount` — say "worst N of TOTAL". */
+  eventsCapped: boolean;
+  densitySeries: Float32Array;
+  densityBinFrames: number;
+}
+
+/** Idiomatic wrapper over the raw Embind Clipping surface (clipping_bindings.cpp, M11). Same
+ *  processAvailableChunks()/finish() polling contract as Statistics/Loudness, driven directly
+ *  against a DecodeSession's audioBufferHandle(). configure() must be called (even with defaults)
+ *  before the first processAvailableChunks() call — matching clip_detector.hpp's parameter
+ *  defaults exactly, so a caller that never calls configure() still gets the engine's own
+ *  defaults rather than embind's zero-initialised numbers. */
+export class Clipping implements Disposable {
+  private handle: RawClippingHandle | null;
+  private readonly module: AudModule;
+
+  private constructor(module: AudModule, handle: RawClippingHandle) {
+    this.module = module;
+    this.handle = handle;
+    leakRegistry.register(this, 'Clipping', this);
+  }
+
+  /** `containerBitDepth` is the source integer container's depth (0 for float sources). */
+  static create(module: AudModule, audioBufferHandle: number, containerBitDepth = 0): Clipping | null {
+    const handle = module.Clipping.create(audioBufferHandle, containerBitDepth);
+    return handle ? new Clipping(module, handle) : null;
+  }
+
+  private get raw(): RawClippingHandle {
+    if (!this.handle) throw new Error('Clipping used after dispose()');
+    return this.handle;
+  }
+
+  /** Must be called before the first processAvailableChunks(); defaults mirror
+   *  ClippingParameters in clip_detector.hpp exactly. */
+  configure(params: ClippingConfigureParams = {}): void {
+    this.raw.configure(
+      params.minRunSamples ?? 3,
+      params.nearClipDbfs ?? -0.1,
+      params.nearClipMinRun ?? 3,
+      params.flatnessToleranceDb ?? 0.0,
+      params.mergeGapSamples ?? 32,
+      params.ispOversampling ?? 4,
+      params.detectInterSamplePeaks ?? true,
+      params.maxStoredEvents ?? 10000,
+    );
+  }
+
+  /** Feeds every AudioBuffer chunk appended since the last call — safe to call repeatedly
+   *  alongside progressive decode. */
+  processAvailableChunks(): void {
+    const result = this.raw.processAvailableChunks();
+    if (!result.ok) throw new Error(`Clipping.processAvailableChunks failed: [${result.code}] ${result.detail ?? ''}`);
+  }
+
+  /** Call once after decode is complete. Copies the density series out (see float32View's
+   *  growth-boundary caveat) so the result is safe to hold past the next allocation. */
+  finish(): ClippingResult {
+    const r = this.raw.finish();
+    if (
+      !r.ok ||
+      r.totalClippedSamples === undefined ||
+      r.clippedFraction === undefined ||
+      r.maxOvershootDb === undefined ||
+      r.flatTopRatio === undefined ||
+      r.meanPlateauLength === undefined ||
+      r.heavyLimitingLikely === undefined ||
+      r.containerBitDepth === undefined ||
+      r.reportJson === undefined ||
+      r.eventCount === undefined ||
+      r.events === undefined ||
+      r.eventsCapped === undefined ||
+      r.densitySeriesPtr === undefined ||
+      r.densitySeriesCount === undefined ||
+      r.densityBinFrames === undefined
+    ) {
+      throw new Error(`Clipping.finish failed: [${r.code}] ${r.detail ?? ''}`);
+    }
+    return {
+      totalClippedSamples: r.totalClippedSamples,
+      clippedFraction: r.clippedFraction,
+      maxOvershootDb: r.maxOvershootDb,
+      flatTopRatio: r.flatTopRatio,
+      meanPlateauLength: r.meanPlateauLength,
+      heavyLimitingLikely: r.heavyLimitingLikely,
+      containerBitDepth: r.containerBitDepth,
+      reportJson: r.reportJson,
+      eventCount: r.eventCount,
+      events: r.events,
+      eventsCapped: r.eventsCapped,
+      densitySeries: float32View(this.module, r.densitySeriesPtr, r.densitySeriesCount).slice(),
+      densityBinFrames: r.densityBinFrames,
+    };
+  }
+
+  dispose(): void {
+    this.handle?.delete();
+    this.handle = null;
+    leakRegistry.unregister(this);
+  }
+
+  [Symbol.dispose](): void {
+    this.dispose();
+  }
+}
+
+export interface DcResult {
+  significanceThresholdDbfs: number;
+  anySignificant: boolean;
+  windowSeconds: number;
+  reportJson: string;
+  channels: DcChannelResult[];
+  /** 1s-resolution windowed mean, interleaved by channel exactly like Statistics's rmsSeries. */
+  windowSeries: Float32Array;
+  windowSeriesChannelCount: number;
+}
+
+/** Idiomatic wrapper over the raw Embind Dc surface (dc_bindings.cpp, M12). Same
+ *  processAvailableChunks()/finish() polling contract as Statistics/Clipping. Never writes
+ *  corrected audio — this is measurement plus analytic preview only. */
+export class Dc implements Disposable {
+  private handle: RawDcHandle | null;
+  private readonly module: AudModule;
+
+  private constructor(module: AudModule, handle: RawDcHandle) {
+    this.module = module;
+    this.handle = handle;
+    leakRegistry.register(this, 'Dc', this);
+  }
+
+  static create(module: AudModule, audioBufferHandle: number): Dc | null {
+    const handle = module.Dc.create(audioBufferHandle);
+    return handle ? new Dc(module, handle) : null;
+  }
+
+  private get raw(): RawDcHandle {
+    if (!this.handle) throw new Error('Dc used after dispose()');
+    return this.handle;
+  }
+
+  /** Must be called before the first processAvailableChunks() to use a non-default significance
+   *  threshold (default -60 dBFS, matching dc_analyzer.hpp's DcConfig). */
+  configure(significanceThresholdDbfs = -60): void {
+    this.raw.configure(significanceThresholdDbfs);
+  }
+
+  processAvailableChunks(): void {
+    const result = this.raw.processAvailableChunks();
+    if (!result.ok) throw new Error(`Dc.processAvailableChunks failed: [${result.code}] ${result.detail ?? ''}`);
+  }
+
+  finish(): DcResult {
+    const r = this.raw.finish();
+    if (
+      !r.ok ||
+      r.significanceThresholdDbfs === undefined ||
+      r.anySignificant === undefined ||
+      r.windowSeconds === undefined ||
+      r.reportJson === undefined ||
+      r.channels === undefined ||
+      r.windowSeriesPtr === undefined ||
+      r.windowSeriesCount === undefined ||
+      r.windowSeriesChannelCount === undefined
+    ) {
+      throw new Error(`Dc.finish failed: [${r.code}] ${r.detail ?? ''}`);
+    }
+    return {
+      significanceThresholdDbfs: r.significanceThresholdDbfs,
+      anySignificant: r.anySignificant,
+      windowSeconds: r.windowSeconds,
+      reportJson: r.reportJson,
+      channels: r.channels,
+      windowSeries: float32View(this.module, r.windowSeriesPtr, r.windowSeriesCount).slice(),
+      windowSeriesChannelCount: r.windowSeriesChannelCount,
+    };
+  }
+
+  dispose(): void {
+    this.handle?.delete();
+    this.handle = null;
+    leakRegistry.unregister(this);
+  }
+
+  [Symbol.dispose](): void {
+    this.dispose();
+  }
+}
+
+export interface BeatsConfigureParams {
+  fftSize?: number;
+  hopSize?: number;
+  timeSignatureBeatsPerBar?: number;
+}
+
+export interface BeatsResult {
+  primaryBpm: number;
+  /** 0..1 — peakiness of the tempo autocorrelation; show this, not just the BPM (M13). */
+  tempoConfidence: number;
+  /** 0..1 — how well the beat grid lands on strong ODF peaks, independent of tempoConfidence. */
+  phaseConfidence: number;
+  /** false if tempo varies meaningfully across ~10s windows — must not be shown as one confident BPM. */
+  tempoIsStable: boolean;
+  odfHopSeconds: number;
+  reportJson: string;
+  onsets: BeatOnset[];
+  beats: Beat[];
+  /** Runners-up including the primary, sorted by score desc (M13's octave-ambiguity handling). */
+  alternatives: TempoCandidateResult[];
+  /** The combined, normalised onset-detection function — retained so the UI can draw it and
+   *  re-threshold instantly. */
+  odf: Float32Array;
+  /** Primary BPM per ~10s window — see tempoIsStable. */
+  tempoSeries: Float32Array;
+}
+
+/** Idiomatic wrapper over the raw Embind Beats surface (beats_bindings.cpp, M13). Same
+ *  processAvailableChunks()/finish() polling contract as Statistics/Clipping/Dc. Runs its own STFT
+ *  pass internally. */
+export class Beats implements Disposable {
+  private handle: RawBeatsHandle | null;
+  private readonly module: AudModule;
+
+  private constructor(module: AudModule, handle: RawBeatsHandle) {
+    this.module = module;
+    this.handle = handle;
+    leakRegistry.register(this, 'Beats', this);
+  }
+
+  static create(module: AudModule, audioBufferHandle: number): Beats | null {
+    const handle = module.Beats.create(audioBufferHandle);
+    return handle ? new Beats(module, handle) : null;
+  }
+
+  private get raw(): RawBeatsHandle {
+    if (!this.handle) throw new Error('Beats used after dispose()');
+    return this.handle;
+  }
+
+  /** Must be called before the first processAvailableChunks() to use non-default parameters
+   *  (0 keeps beat_analyzer.hpp's default for that parameter). */
+  configure(params: BeatsConfigureParams = {}): void {
+    this.raw.configure(params.fftSize ?? 0, params.hopSize ?? 0, params.timeSignatureBeatsPerBar ?? 0);
+  }
+
+  processAvailableChunks(): void {
+    const result = this.raw.processAvailableChunks();
+    if (!result.ok) throw new Error(`Beats.processAvailableChunks failed: [${result.code}] ${result.detail ?? ''}`);
+  }
+
+  private static toResult(
+    module: AudModule,
+    r: ReturnType<RawBeatsHandle['finish']>,
+  ): BeatsResult {
+    if (
+      !r.ok ||
+      r.primaryBpm === undefined ||
+      r.tempoConfidence === undefined ||
+      r.phaseConfidence === undefined ||
+      r.tempoIsStable === undefined ||
+      r.odfHopSeconds === undefined ||
+      r.reportJson === undefined ||
+      r.onsets === undefined ||
+      r.beats === undefined ||
+      r.alternatives === undefined ||
+      r.odfPtr === undefined ||
+      r.odfCount === undefined ||
+      r.tempoSeriesPtr === undefined ||
+      r.tempoSeriesCount === undefined
+    ) {
+      throw new Error(`Beats result failed: [${r.code}] ${r.detail ?? ''}`);
+    }
+    return {
+      primaryBpm: r.primaryBpm,
+      tempoConfidence: r.tempoConfidence,
+      phaseConfidence: r.phaseConfidence,
+      tempoIsStable: r.tempoIsStable,
+      odfHopSeconds: r.odfHopSeconds,
+      reportJson: r.reportJson,
+      onsets: r.onsets,
+      beats: r.beats,
+      alternatives: r.alternatives,
+      odf: float32View(module, r.odfPtr, r.odfCount).slice(),
+      tempoSeries: float32View(module, r.tempoSeriesPtr, r.tempoSeriesCount).slice(),
+    };
+  }
+
+  /** Call once after decode is complete. Copies every heap view out so the result is safe to hold
+   *  past the next allocation. */
+  finish(): BeatsResult {
+    return Beats.toResult(this.module, this.raw.finish());
+  }
+
+  dispose(): void {
+    this.handle?.delete();
+    this.handle = null;
+    leakRegistry.unregister(this);
+  }
+
+  [Symbol.dispose](): void {
+    this.dispose();
+  }
+}
+
+export interface TransientsResult {
+  reportJson: string;
+  /** Musical transients only — defects are surfaced separately. */
+  transients: Transient[];
+  /** Click + Dropout, in one list, for a QA-focused defect panel. */
+  defects: Transient[];
+  /** Indexed by TransientClass (Kick=0, Snare=1, HiHat=2, Percussion=3, TonalOnset=4, Click=5,
+   *  Dropout=6, Unclassified=7), counted across both transients and defects. */
+  countByClass: number[];
+}
+
+/** Idiomatic wrapper over the raw Embind Transients surface (transients_bindings.cpp, M14). Same
+ *  processAvailableChunks()/finish() polling contract as Statistics/Clipping/Dc/Beats. Consumes
+ *  M13's onset list as candidates rather than running a second onset detector — pass a finished
+ *  Beats.finish().onsets (or omit for defect-only detection). */
+export class Transients implements Disposable {
+  private handle: RawTransientsHandle | null;
+  private readonly module: AudModule;
+
+  private constructor(module: AudModule, handle: RawTransientsHandle) {
+    this.module = module;
+    this.handle = handle;
+    leakRegistry.register(this, 'Transients', this);
+  }
+
+  static create(module: AudModule, audioBufferHandle: number, onsets?: readonly BeatOnset[]): Transients | null {
+    if (!onsets || onsets.length === 0) {
+      const handle = module.Transients.create(audioBufferHandle, 0, 0, 0);
+      return handle ? new Transients(module, handle) : null;
+    }
+
+    const times = copyFloat64IntoHeap(module, Float64Array.from(onsets.map((o) => o.timeSeconds)));
+    const strengths = copyFloat32IntoHeap(module, Float32Array.from(onsets.map((o) => o.strength)));
+    noteGrowthBoundary();
+
+    const handle = module.Transients.create(audioBufferHandle, times.ptr, strengths.ptr, onsets.length);
+
+    // TransientsHandle::create() copies these synchronously into its own onset-candidate storage —
+    // free immediately, same discipline as Silence.create()'s series handoff.
+    module._free(times.ptr);
+    module._free(strengths.ptr);
+
+    return handle ? new Transients(module, handle) : null;
+  }
+
+  private get raw(): RawTransientsHandle {
+    if (!this.handle) throw new Error('Transients used after dispose()');
+    return this.handle;
+  }
+
+  processAvailableChunks(): void {
+    const result = this.raw.processAvailableChunks();
+    if (!result.ok) throw new Error(`Transients.processAvailableChunks failed: [${result.code}] ${result.detail ?? ''}`);
+  }
+
+  finish(): TransientsResult {
+    const r = this.raw.finish();
+    if (!r.ok || r.reportJson === undefined || r.transients === undefined || r.defects === undefined || r.countByClass === undefined) {
+      throw new Error(`Transients.finish failed: [${r.code}] ${r.detail ?? ''}`);
+    }
+    return {
+      reportJson: r.reportJson,
+      transients: r.transients,
+      defects: r.defects,
+      countByClass: r.countByClass,
+    };
+  }
+
+  dispose(): void {
+    this.handle?.delete();
+    this.handle = null;
+    leakRegistry.unregister(this);
+  }
+
+  [Symbol.dispose](): void {
+    this.dispose();
+  }
+}
+
 /** Idiomatic wrapper over the raw Embind Metadata surface (metadata_bindings.cpp). One-shot, not a
  *  streaming Analyzer — see M15: metadata is read from the raw encoded file bytes directly, closer
  *  in shape to DecodeSession than to Loudness/Statistics/etc. */
@@ -1243,6 +1659,26 @@ export class AudioEngine implements Disposable {
     momentaryLufs?: Float32Array,
   ): Silence | null {
     return Silence.create(this.module, audioBufferHandle, rmsSeries, rmsSeriesChannelCount, allZeroSeries, momentaryLufs);
+  }
+
+  /** `containerBitDepth` is the source integer container's depth (0 for float sources). Call
+   *  Clipping.configure() before the first processAvailableChunks() to change defaults. */
+  createClipping(audioBufferHandle: number, containerBitDepth = 0): Clipping | null {
+    return Clipping.create(this.module, audioBufferHandle, containerBitDepth);
+  }
+
+  createDc(audioBufferHandle: number): Dc | null {
+    return Dc.create(this.module, audioBufferHandle);
+  }
+
+  createBeats(audioBufferHandle: number): Beats | null {
+    return Beats.create(this.module, audioBufferHandle);
+  }
+
+  /** `onsets` should be a finished Beats.finish().onsets — the M13 candidates this analyser
+   *  refines, classifies and augments with defect detection. Omit for defect-only detection. */
+  createTransients(audioBufferHandle: number, onsets?: readonly BeatOnset[]): Transients | null {
+    return Transients.create(this.module, audioBufferHandle, onsets);
   }
 
   /** `fileBytes` must be the complete file, not a probe slice — see Metadata.create()'s comment. */

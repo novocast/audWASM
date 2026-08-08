@@ -1,11 +1,20 @@
-import { AudioEngine, type DecodeSession, type Waveform } from '../../bindings/wasm/engine.ts';
+import { AudioEngine, type BeatsResult, type DecodeSession, type StatisticsResult, type Waveform } from '../../bindings/wasm/engine.ts';
 import type { WaveformChannelSelector } from '../../bindings/wasm/aud_wasm.d.ts';
 import { renderMetadataPanel, renderNoMetadata } from './metadataPanel.ts';
+import { renderStatisticsPanel, renderNoStatistics } from './statisticsPanel.ts';
+import {
+  beatsToMarkers,
+  clippingToMarkers,
+  dcToMarkers,
+  loudnessToCurve,
+  silenceToMarkers,
+  transientsToMarkers,
+} from './analysisMarkers.ts';
 import { TransportClient, type TransportObservableState } from './playback/transportClient.ts';
 import { defaultViewState, ViewStateStore, type ChannelLayout, type FollowMode, type AmplitudeScaleType, type ViewState, type SpectrogramColorMap } from './renderer/viewState.ts';
 import { createRenderer, detectBackendCapabilities, readBackendOverride, selectBackendName, setBackendOverride, type BackendOverride } from './renderer/backendSelection.ts';
 import { RenderLoop } from './renderer/loop.ts';
-import type { WaveformQueryResult } from './renderer/renderer.ts';
+import type { Renderer, WaveformQueryResult } from './renderer/renderer.ts';
 import { attachInteraction, type SelectionRange } from './renderer/interaction.ts';
 import type { HoverFeedback } from './renderer/playheadOverlay.ts';
 import { attachAccessibleSummary, buildAccessibleSummary } from './renderer/accessibleSummary.ts';
@@ -14,6 +23,13 @@ import { applyThemeOverride, readThemeOverride, setThemeOverride, type ThemeOver
 import { SpectrogramTileManager, chooseFftSize } from './renderer/spectrogram/tileManager.ts';
 import type { FreqAxis } from './renderer/coords.ts';
 import type { SpectrogramDecimationMode } from './renderer/viewState.ts';
+import { MarkerStore } from './overlays/store.ts';
+import type { CurveKind, CurveSeries, Marker, OverlayKind } from './overlays/model.ts';
+import { loadLaneConfigs, saveLaneConfigs, setLaneCollapsed, type LaneConfig } from './overlays/lanes.ts';
+import { hitTestMarkers } from './overlays/hitTest.ts';
+import { jumpToNextError, nextMarkerAnyKind, nextMarkerOfKind } from './overlays/navigation.ts';
+import { FindingsPanel } from './overlays/findingsPanel.ts';
+import { InspectorPanel } from './overlays/inspectorPanel.ts';
 
 const kMinFramesPerPixel = 1 / 64;
 
@@ -93,6 +109,12 @@ function setupPlayback(engine: AudioEngine): void {
   const spectrogramReadout = document.querySelector<HTMLParagraphElement>('#spectrogram-readout')!;
   const metadataSection = document.querySelector<HTMLElement>('#metadata')!;
   const metadataContent = document.querySelector<HTMLElement>('#metadata-content')!;
+  const statisticsSection = document.querySelector<HTMLElement>('#statistics')!;
+  const statisticsContent = document.querySelector<HTMLElement>('#statistics-content')!;
+  const analysisSummaryEl = document.querySelector<HTMLElement>('#analysis-summary')!;
+  const laneTogglesEl = document.querySelector<HTMLElement>('#aud-lane-toggles')!;
+  const findingsPanelHost = document.querySelector<HTMLElement>('#findings-panel-host')!;
+  const inspectorPanelHost = document.querySelector<HTMLElement>('#inspector-panel-host')!;
 
   section.hidden = false;
 
@@ -109,6 +131,74 @@ function setupPlayback(engine: AudioEngine): void {
   let seeking = false;
   let latestTransportState: TransportObservableState | null = null;
   let selection: SelectionRange | null = null;
+
+  // M18 overlays: one MarkerStore for the whole page, repopulated per file load (store.clear() in
+  // the file-input handler). `activeRenderer` mirrors whichever backend mountRenderer() last
+  // created — kept outside that function so the click handler below can hit-test against it.
+  const markerStore = new MarkerStore();
+  let laneConfigs: LaneConfig[] = loadLaneConfigs();
+  let curves: Partial<Record<CurveKind, CurveSeries>> = {};
+  let selectedMarkerId: string | null = null;
+  let lastFocusedKind: OverlayKind = 'error';
+  let activeRenderer: Renderer | null = null;
+
+  function selectMarker(marker: Marker): void {
+    selectedMarkerId = marker.id;
+    lastFocusedKind = marker.kind;
+    findingsPanel.setSelected(marker.id);
+    inspectorPanel.show(marker);
+    loop?.invalidateOverlays();
+  }
+
+  function seekToFrame(frame: number): void {
+    client?.seekToSeconds(frameToSeconds(Math.max(frame, 0), sourceSampleRate));
+  }
+
+  const findingsPanel = new FindingsPanel(markerStore, {
+    formatTime: (frame) => formatSeconds(frameToSeconds(frame, sourceSampleRate)),
+    onSelect: (marker) => {
+      selectMarker(marker);
+      seekToFrame(marker.startFrame);
+    },
+  });
+  findingsPanelHost.appendChild(findingsPanel.root);
+
+  const inspectorPanel = new InspectorPanel({
+    formatTime: (frame) => formatSeconds(frameToSeconds(frame, sourceSampleRate)),
+    onZoomTo: (marker) => {
+      const padFrames = Math.round(sourceSampleRate * 1); // 1s of context on each side
+      const start = Math.max(0, marker.startFrame - padFrames);
+      const end = (marker.endFrame ?? marker.startFrame) + padFrames;
+      viewStore.dispatch({ type: 'zoomToRange', startFrame: start, endFrame: end });
+      loop?.invalidateWaveform();
+    },
+    onLoopThis: (marker) => {
+      if (!client) return;
+      const endFrame = marker.endFrame ?? marker.startFrame + Math.round(sourceSampleRate * 0.5);
+      client.setLoop(true, frameToSeconds(marker.startFrame, sourceSampleRate), frameToSeconds(endFrame, sourceSampleRate));
+      loopToggle.checked = true;
+    },
+  });
+  inspectorPanelHost.appendChild(inspectorPanel.root);
+
+  function renderLaneToggles(): void {
+    laneTogglesEl.replaceChildren(
+      ...laneConfigs.map((lane) => {
+        const label = document.createElement('label');
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.checked = !lane.collapsed;
+        checkbox.addEventListener('change', () => {
+          laneConfigs = setLaneCollapsed(laneConfigs, lane.id, !checkbox.checked);
+          saveLaneConfigs(laneConfigs);
+          loop?.invalidateOverlays();
+        });
+        label.append(checkbox, document.createTextNode(` ${lane.label}`));
+        return label;
+      }),
+    );
+  }
+  renderLaneToggles();
 
   const backendCapabilities = detectBackendCapabilities();
   const viewStore = new ViewStateStore(defaultViewState(), { totalFrames: 0, minFramesPerPixel: kMinFramesPerPixel });
@@ -186,6 +276,7 @@ function setupPlayback(engine: AudioEngine): void {
     const backendName = selectBackendName(override, backendCapabilities);
     const renderer = createRenderer(backendName);
     renderer.attach(waveformContainer);
+    activeRenderer = renderer;
     backendActiveLabel.textContent = `active: ${backendName}`;
 
     loop = new RenderLoop({
@@ -199,6 +290,7 @@ function setupPlayback(engine: AudioEngine): void {
       queryWaveform,
       getSelection: () => selection,
       getMarkers: () => [],
+      getOverlayFrame: () => ({ markers: markerStore, lanes: laneConfigs, curves, selectedMarkerId }),
       getSpectrogramSource: () => (tileManager.isReady ? tileManager : null),
       onBeforeFrame: (nowMs) => {
         if (client) {
@@ -277,8 +369,36 @@ function setupPlayback(engine: AudioEngine): void {
       },
       onReCentre: () => viewStore.dispatch({ type: 'resumeFollow' }),
       formatHoverLabel: (frame) => formatSeconds(frameToSeconds(frame, sourceSampleRate)),
+      // M18: a genuine click (not a drag) on the waveform hit-tests against whatever the active
+      // renderer's most recent overlays pass produced — same candidates the draw call itself used,
+      // per drawOverlays.ts's doc comment on why hitCandidates() is exposed.
+      onClick: (pixelX) => {
+        const marker = activeRenderer ? hitTestMarkers(activeRenderer.hitCandidates(), pixelX, 6) : null;
+        if (marker) selectMarker(marker);
+      },
     },
   );
+
+  // M18 keyboard navigation: Tab/Shift+Tab (next/previous of the last-focused kind), `[`/`]`
+  // (next/previous of any kind), `E` (jump to next error) — all wrap around the track. Kept as a
+  // separate listener rather than folded into interaction.ts's onKeyDown so that module stays free
+  // of any overlays/model.ts dependency (see interaction.ts's own header comment on that seam).
+  waveformContainer.addEventListener('keydown', (event) => {
+    const fromFrame = latestTransportState ? latestTransportState.positionSeconds * sourceSampleRate : 0;
+    let target: Marker | null = null;
+    if (event.key === 'Tab') {
+      event.preventDefault();
+      target = nextMarkerOfKind(markerStore, lastFocusedKind, fromFrame, event.shiftKey ? 'previous' : 'next');
+    } else if (event.key === '[' || event.key === ']') {
+      target = nextMarkerAnyKind(markerStore, fromFrame, event.key === ']' ? 'next' : 'previous');
+    } else if (event.key === 'e' || event.key === 'E') {
+      target = jumpToNextError(markerStore, fromFrame);
+    }
+    if (target) {
+      selectMarker(target);
+      seekToFrame(target.startFrame);
+    }
+  });
 
   backendSelect.addEventListener('change', () => {
     const override = backendSelect.value as BackendOverride;
@@ -337,6 +457,135 @@ function setupPlayback(engine: AudioEngine): void {
     return `${m}:${s.toString().padStart(2, '0')}`;
   }
 
+  // M18/M20: runs every analyser against the fully-decoded session and pushes the results into
+  // markerStore/curves as Marker[]/CurveSeries (analysisMarkers.ts owns the mapping). Synchronous,
+  // same discipline as the decode loop above it — each analyser's create()/dispose() pair is
+  // scoped to this one call so nothing outlives the WASM handle it wraps.
+  function runAnalysis(s: DecodeSession): void {
+    const info = s.streamInfo;
+    const totalFrames = Math.max(s.decodedFrameCount, 0);
+    const handle = s.audioBufferHandle;
+    if (totalFrames === 0 || !handle) return;
+
+    const summaryParts: string[] = [];
+
+    let statsResult: StatisticsResult | null = null;
+    const statistics = engine.createStatistics(handle, info.bitDepth);
+    if (statistics) {
+      try {
+        statistics.processAvailableChunks();
+        statsResult = statistics.finish();
+        renderStatisticsPanel(statisticsContent, statsResult);
+      } finally {
+        statistics.dispose();
+      }
+    } else {
+      renderNoStatistics(statisticsContent);
+    }
+    statisticsSection.hidden = false;
+
+    let momentaryLufs: Float32Array | null = null;
+    const loudness = engine.createLoudness(handle);
+    if (loudness) {
+      try {
+        loudness.processAvailableChunks();
+        const loudnessResult = loudness.finish();
+        momentaryLufs = loudnessResult.momentaryLufs;
+        curves.loudness = loudnessToCurve(momentaryLufs, info.sampleRate);
+        summaryParts.push(`LUFS: ${loudnessResult.integratedLufs.toFixed(1)}`);
+      } finally {
+        loudness.dispose();
+      }
+    }
+
+    if (statsResult) {
+      const silence = engine.createSilence(
+        handle,
+        statsResult.rmsSeries,
+        statsResult.rmsSeriesChannelCount,
+        statsResult.allZeroSeries,
+        momentaryLufs ?? undefined,
+      );
+      if (silence) {
+        try {
+          const detect = silence.detect();
+          const mode = detect.perceptual.regions.length > 0 ? detect.perceptual : detect.threshold;
+          markerStore.replaceAnalysisMarkers('silence', silenceToMarkers(mode));
+          summaryParts.push(`Silence: ${mode.regions.length} region${mode.regions.length === 1 ? '' : 's'}`);
+        } finally {
+          silence.dispose();
+        }
+      }
+    }
+
+    const clipping = engine.createClipping(handle, info.bitDepth);
+    if (clipping) {
+      try {
+        clipping.configure();
+        clipping.processAvailableChunks();
+        const clippingResult = clipping.finish();
+        markerStore.replaceAnalysisMarkers('clipping', clippingToMarkers(clippingResult));
+        const totalEvents = clippingResult.eventCount.reduce((a, b) => a + b, 0);
+        summaryParts.push(
+          `Clipping: ${(clippingResult.clippedFraction * 100).toFixed(2)}% (${totalEvents} event${totalEvents === 1 ? '' : 's'}${
+            clippingResult.eventsCapped ? `, showing worst ${clippingResult.events.length}` : ''
+          })`,
+        );
+      } finally {
+        clipping.dispose();
+      }
+    }
+
+    const dc = engine.createDc(handle);
+    if (dc) {
+      try {
+        dc.processAvailableChunks();
+        const dcResult = dc.finish();
+        markerStore.replaceAnalysisMarkers('dcRegion', dcToMarkers(dcResult, totalFrames));
+        summaryParts.push(dcResult.anySignificant ? 'DC: significant offset detected' : 'DC: none significant');
+      } finally {
+        dc.dispose();
+      }
+    }
+
+    let beatsResult: BeatsResult | null = null;
+    const beats = engine.createBeats(handle);
+    if (beats) {
+      try {
+        beats.processAvailableChunks();
+        beatsResult = beats.finish();
+        const mapped = beatsToMarkers(beatsResult);
+        markerStore.replaceAnalysisMarkers('downbeat', mapped.filter((m) => m.kind === 'downbeat'));
+        markerStore.replaceAnalysisMarkers('beat', mapped.filter((m) => m.kind === 'beat'));
+        summaryParts.push(
+          `Beats: ${beatsResult.primaryBpm.toFixed(1)} BPM (${(beatsResult.tempoConfidence * 100).toFixed(0)}% conf${
+            beatsResult.tempoIsStable ? '' : ', unstable'
+          })`,
+        );
+      } finally {
+        beats.dispose();
+      }
+    }
+
+    const transients = engine.createTransients(handle, beatsResult?.onsets);
+    if (transients) {
+      try {
+        transients.processAvailableChunks();
+        const transientsResult = transients.finish();
+        const { transients: transientMarkers, defects: defectMarkers } = transientsToMarkers(transientsResult);
+        markerStore.replaceAnalysisMarkers('transient', transientMarkers);
+        markerStore.replaceAnalysisMarkers('defect', defectMarkers);
+        summaryParts.push(`Transients: ${defectMarkers.length} defect${defectMarkers.length === 1 ? '' : 's'}`);
+      } finally {
+        transients.dispose();
+      }
+    }
+
+    analysisSummaryEl.textContent = summaryParts.join('  ·  ');
+    findingsPanel.refresh();
+    loop?.invalidateOverlays();
+  }
+
   function render(state: TransportObservableState): void {
     const duration = state.durationSeconds ?? 0;
     if (!seeking) {
@@ -362,6 +611,13 @@ function setupPlayback(engine: AudioEngine): void {
       waveform = null;
       session = null;
       selection = null;
+      markerStore.clear();
+      curves = {};
+      selectedMarkerId = null;
+      analysisSummaryEl.textContent = '';
+      statisticsSection.hidden = true;
+      inspectorPanel.showEmpty();
+      findingsPanel.refresh();
       viewStore.dispatch({ type: 'panToStart', startFrame: 0 });
       playbackStatus.textContent = 'Decoding…';
 
@@ -424,6 +680,9 @@ function setupPlayback(engine: AudioEngine): void {
       newSession.finish();
       waveform?.finish();
       waveform = stepWaveform(waveform);
+
+      playbackStatus.textContent = 'Analysing…';
+      runAnalysis(newSession);
 
       const info = newSession.streamInfo;
       sourceSampleRate = info.sampleRate;

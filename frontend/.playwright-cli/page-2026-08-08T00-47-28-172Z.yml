@@ -1,0 +1,2243 @@
+- generic [ref=e2]:
+  - heading "audWASM" [level=1] [ref=e3]
+  - paragraph [ref=e4]: "Engine self-test: PASS"
+  - generic [ref=e5]:
+    - term [ref=e6]: version
+    - definition [ref=e7]: 0.1.0
+    - term [ref=e8]: simd
+    - definition [ref=e9]: "true"
+    - term [ref=e10]: threads
+    - definition [ref=e11]: "false"
+    - term [ref=e12]: optimisation
+    - definition [ref=e13]: Release
+  - generic [ref=e14]:
+    - heading "Playback (M03)" [level=2] [ref=e15]
+    - button "Choose File" [active] [ref=e16]
+    - paragraph [ref=e17]: "Loaded: mp3, 48000Hz, 2ch"
+    - generic [ref=e18]:
+      - button "Play" [ref=e19]
+      - button "Pause" [disabled] [ref=e20]
+      - generic [ref=e21]:
+        - text: Seek
+        - slider "Seek" [ref=e22]: "0.027"
+      - generic [ref=e23]:
+        - text: Gain
+        - slider "Gain" [ref=e24]: "1"
+      - generic [ref=e25]:
+        - checkbox "Loop whole track" [ref=e26]
+        - text: Loop whole track
+    - paragraph [ref=e27]: 0:00 / 2:31
+    - paragraph [ref=e85]: "LUFS: -14.1 · Silence: 0 regions · Clipping: 0.00% (0 events) · DC: significant offset detected · Beats: 70.5 BPM (46% conf, unstable) · Transients: 41654 defects"
+    - heading "Renderer (M17)" [level=3] [ref=e28]
+    - generic [ref=e29]:
+      - generic [ref=e30]:
+        - text: Backend
+        - combobox "Backend" [ref=e31]:
+          - option "Auto" [selected]
+          - option "WebGL2"
+          - option "Canvas2D"
+      - generic [ref=e32]:
+        - text: Channels
+        - combobox "Channels" [ref=e33]:
+          - option "Split" [selected]
+          - option "Overlaid"
+          - option "Mono sum"
+          - option "Mid/Side"
+      - generic [ref=e34]:
+        - text: Amplitude
+        - combobox "Amplitude" [ref=e35]:
+          - option "Linear" [selected]
+          - option "dB"
+          - option "Root"
+      - generic [ref=e36]:
+        - text: Follow
+        - combobox "Follow" [ref=e37]:
+          - option "Off" [selected]
+          - option "Page"
+          - option "Scroll"
+          - option "Centre"
+      - generic [ref=e38]:
+        - text: Theme
+        - combobox "Theme" [ref=e39]:
+          - option "Auto (OS)" [selected]
+          - option "Light"
+          - option "Dark"
+          - option "High contrast"
+      - text: "active: webgl2 avg 42.45ms p99 197.70ms"
+    - heading "Spectrogram (M07)" [level=3] [ref=e40]
+    - generic [ref=e41]:
+      - generic [ref=e42]:
+        - text: Colour map
+        - combobox "Colour map" [ref=e43]:
+          - option "Viridis" [selected]
+          - option "Magma"
+          - option "Inferno"
+          - option "Greyscale"
+          - option "Classic (not perceptually uniform)"
+      - generic [ref=e44]:
+        - text: Freq axis
+        - combobox "Freq axis" [ref=e45]:
+          - option "Log" [selected]
+          - option "Linear"
+          - option "Mel"
+          - option "Bark"
+      - generic [ref=e46]:
+        - text: Floor dB
+        - slider "Floor dB" [ref=e47]: "-96"
+      - generic [ref=e48]:
+        - text: Gain dB
+        - slider "Gain dB" [ref=e49]: "0"
+      - generic [ref=e50]:
+        - text: Gamma
+        - slider "Gamma" [ref=e51]: "1"
+      - generic [ref=e52]:
+        - text: Decimation
+        - combobox "Decimation" [ref=e53]:
+          - option "Max" [selected]
+          - option "Mean"
+      - text: "spectrogram: 4 tiles resident"
+    - paragraph [ref=e54]: Hover the spectrogram for an exact frequency/level reading.
+    - heading "Findings (M18)" [level=3] [ref=e55]
+    - generic [ref=e56]:
+      - generic [ref=e57]:
+        - checkbox "Chapters / cue points" [checked] [ref=e58]
+        - text: Chapters / cue points
+      - generic [ref=e59]:
+        - checkbox "Beats / bars" [checked] [ref=e60]
+        - text: Beats / bars
+      - generic [ref=e61]:
+        - checkbox "Loudness" [checked] [ref=e62]
+        - text: Loudness
+      - generic [ref=e63]:
+        - checkbox "Transients / defects" [checked] [ref=e64]
+        - text: Transients / defects
+      - generic [ref=e65]:
+        - checkbox "Lyrics" [ref=e66]
+        - text: Lyrics
+      - generic [ref=e67]:
+        - checkbox "Errors / decoder events" [checked] [ref=e68]
+        - text: Errors / decoder events
+    - generic [ref=e69]:
+      - img "Waveform viewer" [ref=e70]:
+        - generic [ref=e71]: Audio waveform, 2:31 duration, stereo, 48000 Hz. Currently showing 0:00 to 2:31.
+      - complementary "Findings and inspector" [ref=e72]:
+        - generic [ref=e74]:
+          - generic [ref=e75]:
+            - combobox [ref=e76]:
+              - option "All kinds (42905)"
+              - option "beat (179)"
+              - option "clipping (0)"
+              - option "dcRegion (2)"
+              - option "defect (41654)"
+              - option "downbeat (0)"
+              - option "silence (0)"
+              - option "transient (1070)"
+            - 'button "Sort: time" [ref=e77]'
+            - 'button "Sort: kind" [ref=e78]'
+            - 'button "Sort: severity" [ref=e79]'
+          - generic [ref=e80]:
+            - generic [ref=e86] [cursor=pointer]:
+              - generic [ref=e87]: dcRegion
+              - generic [ref=e88]: 0:00
+              - generic [ref=e89]: "sectional DC offset: -75.5dBFS"
+            - generic [ref=e90] [cursor=pointer]:
+              - generic [ref=e91]: dcRegion
+              - generic [ref=e92]: 0:00
+              - generic [ref=e93]: "sectional DC offset: -80.1dBFS"
+            - generic [ref=e94] [cursor=pointer]:
+              - generic [ref=e95]: defect
+              - generic [ref=e96]: 1:48
+              - generic [ref=e97]: click 67%
+            - generic [ref=e98] [cursor=pointer]:
+              - generic [ref=e99]: defect
+              - generic [ref=e100]: 2:10
+              - generic [ref=e101]: click 79%
+            - generic [ref=e102] [cursor=pointer]:
+              - generic [ref=e103]: defect
+              - generic [ref=e104]: 2:17
+              - generic [ref=e105]: click 81%
+            - generic [ref=e106] [cursor=pointer]:
+              - generic [ref=e107]: defect
+              - generic [ref=e108]: 2:22
+              - generic [ref=e109]: click 64%
+            - generic [ref=e110] [cursor=pointer]:
+              - generic [ref=e111]: defect
+              - generic [ref=e112]: 3:48
+              - generic [ref=e113]: click 75%
+            - generic [ref=e114] [cursor=pointer]:
+              - generic [ref=e115]: defect
+              - generic [ref=e116]: 4:18
+              - generic [ref=e117]: click 76%
+            - generic [ref=e118] [cursor=pointer]:
+              - generic [ref=e119]: defect
+              - generic [ref=e120]: 8:32
+              - generic [ref=e121]: click 93%
+            - generic [ref=e122] [cursor=pointer]:
+              - generic [ref=e123]: defect
+              - generic [ref=e124]: 12:42
+              - generic [ref=e125]: click 68%
+            - generic [ref=e126] [cursor=pointer]:
+              - generic [ref=e127]: beat
+              - generic [ref=e128]: 33:57
+            - generic [ref=e130] [cursor=pointer]:
+              - generic [ref=e131]: transient
+              - generic [ref=e132]: 42:24
+              - generic [ref=e133]: tonalOnset 100%
+            - generic [ref=e134] [cursor=pointer]:
+              - generic [ref=e135]: defect
+              - generic [ref=e136]: 43:05
+              - generic [ref=e137]: click 84%
+            - generic [ref=e138] [cursor=pointer]:
+              - generic [ref=e139]: defect
+              - generic [ref=e140]: 55:35
+              - generic [ref=e141]: click 64%
+            - generic [ref=e142] [cursor=pointer]:
+              - generic [ref=e143]: defect
+              - generic [ref=e144]: 59:08
+              - generic [ref=e145]: click 75%
+            - generic [ref=e146] [cursor=pointer]:
+              - generic [ref=e147]: defect
+              - generic [ref=e148]: 66:44
+              - generic [ref=e149]: click 72%
+            - generic [ref=e150] [cursor=pointer]:
+              - generic [ref=e151]: defect
+              - generic [ref=e152]: 70:12
+              - generic [ref=e153]: click 67%
+            - generic [ref=e154] [cursor=pointer]:
+              - generic [ref=e155]: defect
+              - generic [ref=e156]: 70:30
+              - generic [ref=e157]: click 65%
+            - generic [ref=e158] [cursor=pointer]:
+              - generic [ref=e159]: defect
+              - generic [ref=e160]: 70:54
+              - generic [ref=e161]: click 82%
+            - generic [ref=e162] [cursor=pointer]:
+              - generic [ref=e163]: defect
+              - generic [ref=e164]: 76:58
+              - generic [ref=e165]: click 66%
+            - generic [ref=e166] [cursor=pointer]:
+              - generic [ref=e167]: defect
+              - generic [ref=e168]: 79:23
+              - generic [ref=e169]: click 79%
+            - generic [ref=e170] [cursor=pointer]:
+              - generic [ref=e171]: defect
+              - generic [ref=e172]: 82:33
+              - generic [ref=e173]: click 70%
+            - generic [ref=e174] [cursor=pointer]:
+              - generic [ref=e175]: defect
+              - generic [ref=e176]: 93:55
+              - generic [ref=e177]: click 63%
+            - generic [ref=e178] [cursor=pointer]:
+              - generic [ref=e179]: defect
+              - generic [ref=e180]: 101:53
+              - generic [ref=e181]: click 66%
+            - generic [ref=e182] [cursor=pointer]:
+              - generic [ref=e183]: defect
+              - generic [ref=e184]: 113:08
+              - generic [ref=e185]: click 98%
+            - generic [ref=e186] [cursor=pointer]:
+              - generic [ref=e187]: defect
+              - generic [ref=e188]: 123:46
+              - generic [ref=e189]: click 71%
+            - generic [ref=e190] [cursor=pointer]:
+              - generic [ref=e191]: defect
+              - generic [ref=e192]: 128:52
+              - generic [ref=e193]: click 69%
+            - generic [ref=e194] [cursor=pointer]:
+              - generic [ref=e195]: defect
+              - generic [ref=e196]: 131:27
+              - generic [ref=e197]: click 69%
+            - generic [ref=e198] [cursor=pointer]:
+              - generic [ref=e199]: defect
+              - generic [ref=e200]: 132:54
+              - generic [ref=e201]: click 67%
+            - generic [ref=e202] [cursor=pointer]:
+              - generic [ref=e203]: defect
+              - generic [ref=e204]: 138:25
+              - generic [ref=e205]: click 77%
+            - generic [ref=e206] [cursor=pointer]:
+              - generic [ref=e207]: defect
+              - generic [ref=e208]: 157:05
+              - generic [ref=e209]: click 79%
+            - generic [ref=e210] [cursor=pointer]:
+              - generic [ref=e211]: defect
+              - generic [ref=e212]: 161:53
+              - generic [ref=e213]: click 69%
+            - generic [ref=e214] [cursor=pointer]:
+              - generic [ref=e215]: defect
+              - generic [ref=e216]: 195:44
+              - generic [ref=e217]: click 74%
+            - generic [ref=e218] [cursor=pointer]:
+              - generic [ref=e219]: defect
+              - generic [ref=e220]: 200:35
+              - generic [ref=e221]: click 65%
+            - generic [ref=e222] [cursor=pointer]:
+              - generic [ref=e223]: defect
+              - generic [ref=e224]: 203:07
+              - generic [ref=e225]: click 71%
+            - generic [ref=e226] [cursor=pointer]:
+              - generic [ref=e227]: defect
+              - generic [ref=e228]: 217:52
+              - generic [ref=e229]: click 73%
+            - generic [ref=e230] [cursor=pointer]:
+              - generic [ref=e231]: defect
+              - generic [ref=e232]: 220:13
+              - generic [ref=e233]: click 73%
+            - generic [ref=e234] [cursor=pointer]:
+              - generic [ref=e235]: defect
+              - generic [ref=e236]: 222:01
+              - generic [ref=e237]: click 72%
+            - generic [ref=e238] [cursor=pointer]:
+              - generic [ref=e239]: defect
+              - generic [ref=e240]: 235:07
+              - generic [ref=e241]: click 66%
+            - generic [ref=e242] [cursor=pointer]:
+              - generic [ref=e243]: defect
+              - generic [ref=e244]: 271:20
+              - generic [ref=e245]: click 86%
+            - generic [ref=e246] [cursor=pointer]:
+              - generic [ref=e247]: defect
+              - generic [ref=e248]: 273:23
+              - generic [ref=e249]: click 65%
+            - generic [ref=e250] [cursor=pointer]:
+              - generic [ref=e251]: transient
+              - generic [ref=e252]: 277:56
+              - generic [ref=e253]: tonalOnset 100%
+            - generic [ref=e254] [cursor=pointer]:
+              - generic [ref=e255]: defect
+              - generic [ref=e256]: 289:00
+              - generic [ref=e257]: click 68%
+            - generic [ref=e258] [cursor=pointer]:
+              - generic [ref=e259]: defect
+              - generic [ref=e260]: 294:03
+              - generic [ref=e261]: click 65%
+            - generic [ref=e262] [cursor=pointer]:
+              - generic [ref=e263]: defect
+              - generic [ref=e264]: 299:40
+              - generic [ref=e265]: click 68%
+            - generic [ref=e266] [cursor=pointer]:
+              - generic [ref=e267]: defect
+              - generic [ref=e268]: 303:49
+              - generic [ref=e269]: click 68%
+            - generic [ref=e270] [cursor=pointer]:
+              - generic [ref=e271]: transient
+              - generic [ref=e272]: 314:18
+              - generic [ref=e273]: tonalOnset 100%
+            - generic [ref=e274] [cursor=pointer]:
+              - generic [ref=e275]: defect
+              - generic [ref=e276]: 319:32
+              - generic [ref=e277]: click 66%
+            - generic [ref=e278] [cursor=pointer]:
+              - generic [ref=e279]: defect
+              - generic [ref=e280]: 326:12
+              - generic [ref=e281]: click 65%
+            - generic [ref=e282] [cursor=pointer]:
+              - generic [ref=e283]: defect
+              - generic [ref=e284]: 328:18
+              - generic [ref=e285]: click 74%
+            - generic [ref=e286] [cursor=pointer]:
+              - generic [ref=e287]: defect
+              - generic [ref=e288]: 337:01
+              - generic [ref=e289]: click 63%
+            - generic [ref=e290] [cursor=pointer]:
+              - generic [ref=e291]: defect
+              - generic [ref=e292]: 339:19
+              - generic [ref=e293]: click 66%
+            - generic [ref=e294] [cursor=pointer]:
+              - generic [ref=e295]: defect
+              - generic [ref=e296]: 363:20
+              - generic [ref=e297]: click 75%
+            - generic [ref=e298] [cursor=pointer]:
+              - generic [ref=e299]: defect
+              - generic [ref=e300]: 373:41
+              - generic [ref=e301]: click 72%
+            - generic [ref=e302] [cursor=pointer]:
+              - generic [ref=e303]: defect
+              - generic [ref=e304]: 408:23
+              - generic [ref=e305]: click 66%
+            - generic [ref=e306] [cursor=pointer]:
+              - generic [ref=e307]: transient
+              - generic [ref=e308]: 436:44
+              - generic [ref=e309]: tonalOnset 99%
+            - generic [ref=e310] [cursor=pointer]:
+              - generic [ref=e311]: defect
+              - generic [ref=e312]: 451:37
+              - generic [ref=e313]: click 65%
+            - generic [ref=e314] [cursor=pointer]:
+              - generic [ref=e315]: defect
+              - generic [ref=e316]: 468:12
+              - generic [ref=e317]: click 72%
+            - generic [ref=e318] [cursor=pointer]:
+              - generic [ref=e319]: defect
+              - generic [ref=e320]: 471:03
+              - generic [ref=e321]: click 64%
+            - generic [ref=e322] [cursor=pointer]:
+              - generic [ref=e323]: defect
+              - generic [ref=e324]: 473:00
+              - generic [ref=e325]: click 68%
+            - generic [ref=e326] [cursor=pointer]:
+              - generic [ref=e327]: defect
+              - generic [ref=e328]: 483:04
+              - generic [ref=e329]: click 68%
+            - generic [ref=e330] [cursor=pointer]:
+              - generic [ref=e331]: transient
+              - generic [ref=e332]: 504:48
+              - generic [ref=e333]: tonalOnset 99%
+            - generic [ref=e334] [cursor=pointer]:
+              - generic [ref=e335]: defect
+              - generic [ref=e336]: 508:19
+              - generic [ref=e337]: click 76%
+            - generic [ref=e338] [cursor=pointer]:
+              - generic [ref=e339]: defect
+              - generic [ref=e340]: 509:20
+              - generic [ref=e341]: click 71%
+            - generic [ref=e342] [cursor=pointer]:
+              - generic [ref=e343]: defect
+              - generic [ref=e344]: 526:49
+              - generic [ref=e345]: click 68%
+            - generic [ref=e346] [cursor=pointer]:
+              - generic [ref=e347]: defect
+              - generic [ref=e348]: 529:07
+              - generic [ref=e349]: click 87%
+            - generic [ref=e350] [cursor=pointer]:
+              - generic [ref=e351]: defect
+              - generic [ref=e352]: 540:12
+              - generic [ref=e353]: click 72%
+            - generic [ref=e354] [cursor=pointer]:
+              - generic [ref=e355]: defect
+              - generic [ref=e356]: 544:26
+              - generic [ref=e357]: click 69%
+            - generic [ref=e358] [cursor=pointer]:
+              - generic [ref=e359]: defect
+              - generic [ref=e360]: 544:45
+              - generic [ref=e361]: click 76%
+            - generic [ref=e362] [cursor=pointer]:
+              - generic [ref=e363]: defect
+              - generic [ref=e364]: 551:37
+              - generic [ref=e365]: click 65%
+            - generic [ref=e366] [cursor=pointer]:
+              - generic [ref=e367]: defect
+              - generic [ref=e368]: 574:36
+              - generic [ref=e369]: click 64%
+            - generic [ref=e370] [cursor=pointer]:
+              - generic [ref=e371]: defect
+              - generic [ref=e372]: 577:00
+              - generic [ref=e373]: click 66%
+            - generic [ref=e374] [cursor=pointer]:
+              - generic [ref=e375]: defect
+              - generic [ref=e376]: 586:12
+              - generic [ref=e377]: click 66%
+            - generic [ref=e378] [cursor=pointer]:
+              - generic [ref=e379]: defect
+              - generic [ref=e380]: 593:15
+              - generic [ref=e381]: click 83%
+            - generic [ref=e382] [cursor=pointer]:
+              - generic [ref=e383]: defect
+              - generic [ref=e384]: 595:32
+              - generic [ref=e385]: click 86%
+            - generic [ref=e386] [cursor=pointer]:
+              - generic [ref=e387]: defect
+              - generic [ref=e388]: 597:50
+              - generic [ref=e389]: click 84%
+            - generic [ref=e390] [cursor=pointer]:
+              - generic [ref=e391]: defect
+              - generic [ref=e392]: 600:05
+              - generic [ref=e393]: click 87%
+            - generic [ref=e394] [cursor=pointer]:
+              - generic [ref=e395]: defect
+              - generic [ref=e396]: 604:34
+              - generic [ref=e397]: click 67%
+            - generic [ref=e398] [cursor=pointer]:
+              - generic [ref=e399]: defect
+              - generic [ref=e400]: 606:53
+              - generic [ref=e401]: click 93%
+            - generic [ref=e402] [cursor=pointer]:
+              - generic [ref=e403]: defect
+              - generic [ref=e404]: 611:22
+              - generic [ref=e405]: click 66%
+            - generic [ref=e406] [cursor=pointer]:
+              - generic [ref=e407]: defect
+              - generic [ref=e408]: 613:40
+              - generic [ref=e409]: click 66%
+            - generic [ref=e410] [cursor=pointer]:
+              - generic [ref=e411]: defect
+              - generic [ref=e412]: 615:58
+              - generic [ref=e413]: click 83%
+            - generic [ref=e414] [cursor=pointer]:
+              - generic [ref=e415]: defect
+              - generic [ref=e416]: 616:05
+              - generic [ref=e417]: click 73%
+            - generic [ref=e418] [cursor=pointer]:
+              - generic [ref=e419]: defect
+              - generic [ref=e420]: 618:12
+              - generic [ref=e421]: click 64%
+            - generic [ref=e422] [cursor=pointer]:
+              - generic [ref=e423]: defect
+              - generic [ref=e424]: 618:23
+              - generic [ref=e425]: click 100%
+            - generic [ref=e426] [cursor=pointer]:
+              - generic [ref=e427]: defect
+              - generic [ref=e428]: 620:30
+              - generic [ref=e429]: click 74%
+            - generic [ref=e430] [cursor=pointer]:
+              - generic [ref=e431]: defect
+              - generic [ref=e432]: 620:33
+              - generic [ref=e433]: click 89%
+            - generic [ref=e434] [cursor=pointer]:
+              - generic [ref=e435]: defect
+              - generic [ref=e436]: 620:41
+              - generic [ref=e437]: click 99%
+            - generic [ref=e438] [cursor=pointer]:
+              - generic [ref=e439]: defect
+              - generic [ref=e440]: 622:48
+              - generic [ref=e441]: click 76%
+            - generic [ref=e442] [cursor=pointer]:
+              - generic [ref=e443]: defect
+              - generic [ref=e444]: 622:51
+              - generic [ref=e445]: click 90%
+            - generic [ref=e446] [cursor=pointer]:
+              - generic [ref=e447]: defect
+              - generic [ref=e448]: 625:05
+              - generic [ref=e449]: click 79%
+            - generic [ref=e450] [cursor=pointer]:
+              - generic [ref=e451]: defect
+              - generic [ref=e452]: 625:17
+              - generic [ref=e453]: click 91%
+            - generic [ref=e454] [cursor=pointer]:
+              - generic [ref=e455]: defect
+              - generic [ref=e456]: 629:53
+              - generic [ref=e457]: click 70%
+            - generic [ref=e458] [cursor=pointer]:
+              - generic [ref=e459]: defect
+              - generic [ref=e460]: 632:07
+              - generic [ref=e461]: click 81%
+            - generic [ref=e462] [cursor=pointer]:
+              - generic [ref=e463]: defect
+              - generic [ref=e464]: 632:27
+              - generic [ref=e465]: click 66%
+            - generic [ref=e466] [cursor=pointer]:
+              - generic [ref=e467]: defect
+              - generic [ref=e468]: 634:25
+              - generic [ref=e469]: click 93%
+            - generic [ref=e470] [cursor=pointer]:
+              - generic [ref=e471]: defect
+              - generic [ref=e472]: 634:46
+              - generic [ref=e473]: click 67%
+            - generic [ref=e474] [cursor=pointer]:
+              - generic [ref=e475]: defect
+              - generic [ref=e476]: 636:47
+              - generic [ref=e477]: click 69%
+            - generic [ref=e478] [cursor=pointer]:
+              - generic [ref=e479]: defect
+              - generic [ref=e480]: 639:05
+              - generic [ref=e481]: click 72%
+            - generic [ref=e482] [cursor=pointer]:
+              - generic [ref=e483]: defect
+              - generic [ref=e484]: 639:21
+              - generic [ref=e485]: click 64%
+            - generic [ref=e486] [cursor=pointer]:
+              - generic [ref=e487]: defect
+              - generic [ref=e488]: 641:07
+              - generic [ref=e489]: click 70%
+            - generic [ref=e490] [cursor=pointer]:
+              - generic [ref=e491]: defect
+              - generic [ref=e492]: 641:27
+              - generic [ref=e493]: click 68%
+            - generic [ref=e494] [cursor=pointer]:
+              - generic [ref=e495]: defect
+              - generic [ref=e496]: 641:39
+              - generic [ref=e497]: click 70%
+            - generic [ref=e498] [cursor=pointer]:
+              - generic [ref=e499]: defect
+              - generic [ref=e500]: 643:25
+              - generic [ref=e501]: click 72%
+            - generic [ref=e502] [cursor=pointer]:
+              - generic [ref=e503]: defect
+              - generic [ref=e504]: 643:45
+              - generic [ref=e505]: click 81%
+            - generic [ref=e506] [cursor=pointer]:
+              - generic [ref=e507]: defect
+              - generic [ref=e508]: 646:03
+              - generic [ref=e509]: click 82%
+            - generic [ref=e510] [cursor=pointer]:
+              - generic [ref=e511]: defect
+              - generic [ref=e512]: 646:15
+              - generic [ref=e513]: click 74%
+            - generic [ref=e514] [cursor=pointer]:
+              - generic [ref=e515]: defect
+              - generic [ref=e516]: 648:00
+              - generic [ref=e517]: click 80%
+            - generic [ref=e518] [cursor=pointer]:
+              - generic [ref=e519]: defect
+              - generic [ref=e520]: 648:21
+              - generic [ref=e521]: click 85%
+            - generic [ref=e522] [cursor=pointer]:
+              - generic [ref=e523]: defect
+              - generic [ref=e524]: 648:27
+              - generic [ref=e525]: click 64%
+            - generic [ref=e526] [cursor=pointer]:
+              - generic [ref=e527]: defect
+              - generic [ref=e528]: 648:32
+              - generic [ref=e529]: click 65%
+            - generic [ref=e530] [cursor=pointer]:
+              - generic [ref=e531]: defect
+              - generic [ref=e532]: 650:18
+              - generic [ref=e533]: click 75%
+            - generic [ref=e534] [cursor=pointer]:
+              - generic [ref=e535]: defect
+              - generic [ref=e536]: 650:38
+              - generic [ref=e537]: click 70%
+            - generic [ref=e538] [cursor=pointer]:
+              - generic [ref=e539]: defect
+              - generic [ref=e540]: 650:45
+              - generic [ref=e541]: click 77%
+            - generic [ref=e542] [cursor=pointer]:
+              - generic [ref=e543]: defect
+              - generic [ref=e544]: 650:50
+              - generic [ref=e545]: click 71%
+            - generic [ref=e546] [cursor=pointer]:
+              - generic [ref=e547]: defect
+              - generic [ref=e548]: 652:36
+              - generic [ref=e549]: click 69%
+            - generic [ref=e550] [cursor=pointer]:
+              - generic [ref=e551]: defect
+              - generic [ref=e552]: 653:03
+              - generic [ref=e553]: click 70%
+            - generic [ref=e554] [cursor=pointer]:
+              - generic [ref=e555]: defect
+              - generic [ref=e556]: 655:12
+              - generic [ref=e557]: click 73%
+            - generic [ref=e558] [cursor=pointer]:
+              - generic [ref=e559]: defect
+              - generic [ref=e560]: 657:39
+              - generic [ref=e561]: click 86%
+            - generic [ref=e562] [cursor=pointer]:
+              - generic [ref=e563]: defect
+              - generic [ref=e564]: 657:45
+              - generic [ref=e565]: click 90%
+            - generic [ref=e566] [cursor=pointer]:
+              - generic [ref=e567]: defect
+              - generic [ref=e568]: 659:29
+              - generic [ref=e569]: click 67%
+            - generic [ref=e570] [cursor=pointer]:
+              - generic [ref=e571]: defect
+              - generic [ref=e572]: 659:57
+              - generic [ref=e573]: click 72%
+            - generic [ref=e574] [cursor=pointer]:
+              - generic [ref=e575]: defect
+              - generic [ref=e576]: 662:08
+              - generic [ref=e577]: click 75%
+            - generic [ref=e578] [cursor=pointer]:
+              - generic [ref=e579]: defect
+              - generic [ref=e580]: 662:15
+              - generic [ref=e581]: click 84%
+            - generic [ref=e582] [cursor=pointer]:
+              - generic [ref=e583]: defect
+              - generic [ref=e584]: 662:20
+              - generic [ref=e585]: click 84%
+            - generic [ref=e586] [cursor=pointer]:
+              - generic [ref=e587]: defect
+              - generic [ref=e588]: 664:25
+              - generic [ref=e589]: click 74%
+            - generic [ref=e590] [cursor=pointer]:
+              - generic [ref=e591]: defect
+              - generic [ref=e592]: 664:32
+              - generic [ref=e593]: click 73%
+            - generic [ref=e594] [cursor=pointer]:
+              - generic [ref=e595]: beat
+              - generic [ref=e596]: 675:05
+            - generic [ref=e598] [cursor=pointer]:
+              - generic [ref=e599]: transient
+              - generic [ref=e600]: 680:04
+              - generic [ref=e601]: tonalOnset 100%
+            - generic [ref=e602] [cursor=pointer]:
+              - generic [ref=e603]: defect
+              - generic [ref=e604]: 680:25
+              - generic [ref=e605]: click 76%
+            - generic [ref=e606] [cursor=pointer]:
+              - generic [ref=e607]: defect
+              - generic [ref=e608]: 680:46
+              - generic [ref=e609]: click 84%
+            - generic [ref=e610] [cursor=pointer]:
+              - generic [ref=e611]: defect
+              - generic [ref=e612]: 682:55
+              - generic [ref=e613]: click 68%
+            - generic [ref=e614] [cursor=pointer]:
+              - generic [ref=e615]: defect
+              - generic [ref=e616]: 685:00
+              - generic [ref=e617]: click 100%
+            - generic [ref=e618] [cursor=pointer]:
+              - generic [ref=e619]: defect
+              - generic [ref=e620]: 685:20
+              - generic [ref=e621]: click 75%
+            - generic [ref=e622] [cursor=pointer]:
+              - generic [ref=e623]: defect
+              - generic [ref=e624]: 685:40
+              - generic [ref=e625]: click 71%
+            - generic [ref=e626] [cursor=pointer]:
+              - generic [ref=e627]: defect
+              - generic [ref=e628]: 685:47
+              - generic [ref=e629]: click 64%
+            - generic [ref=e630] [cursor=pointer]:
+              - generic [ref=e631]: defect
+              - generic [ref=e632]: 687:28
+              - generic [ref=e633]: click 100%
+            - generic [ref=e634] [cursor=pointer]:
+              - generic [ref=e635]: defect
+              - generic [ref=e636]: 692:10
+              - generic [ref=e637]: click 96%
+            - generic [ref=e638] [cursor=pointer]:
+              - generic [ref=e639]: defect
+              - generic [ref=e640]: 696:10
+              - generic [ref=e641]: click 71%
+            - generic [ref=e642] [cursor=pointer]:
+              - generic [ref=e643]: defect
+              - generic [ref=e644]: 696:18
+              - generic [ref=e645]: click 77%
+            - generic [ref=e646] [cursor=pointer]:
+              - generic [ref=e647]: defect
+              - generic [ref=e648]: 696:24
+              - generic [ref=e649]: click 67%
+            - generic [ref=e650] [cursor=pointer]:
+              - generic [ref=e651]: defect
+              - generic [ref=e652]: 696:34
+              - generic [ref=e653]: click 88%
+            - generic [ref=e654] [cursor=pointer]:
+              - generic [ref=e655]: defect
+              - generic [ref=e656]: 696:39
+              - generic [ref=e657]: click 89%
+            - generic [ref=e658] [cursor=pointer]:
+              - generic [ref=e659]: defect
+              - generic [ref=e660]: 696:44
+              - generic [ref=e661]: click 82%
+            - generic [ref=e662] [cursor=pointer]:
+              - generic [ref=e663]: defect
+              - generic [ref=e664]: 696:52
+              - generic [ref=e665]: click 69%
+            - generic [ref=e666] [cursor=pointer]:
+              - generic [ref=e667]: defect
+              - generic [ref=e668]: 697:03
+              - generic [ref=e669]: click 72%
+            - generic [ref=e670] [cursor=pointer]:
+              - generic [ref=e671]: defect
+              - generic [ref=e672]: 697:12
+              - generic [ref=e673]: click 69%
+            - generic [ref=e674] [cursor=pointer]:
+              - generic [ref=e675]: defect
+              - generic [ref=e676]: 698:08
+              - generic [ref=e677]: click 70%
+            - generic [ref=e678] [cursor=pointer]:
+              - generic [ref=e679]: defect
+              - generic [ref=e680]: 712:54
+              - generic [ref=e681]: click 91%
+            - generic [ref=e682] [cursor=pointer]:
+              - generic [ref=e683]: defect
+              - generic [ref=e684]: 713:17
+              - generic [ref=e685]: click 95%
+            - generic [ref=e686] [cursor=pointer]:
+              - generic [ref=e687]: defect
+              - generic [ref=e688]: 713:35
+              - generic [ref=e689]: click 72%
+            - generic [ref=e690] [cursor=pointer]:
+              - generic [ref=e691]: defect
+              - generic [ref=e692]: 725:41
+              - generic [ref=e693]: click 72%
+            - generic [ref=e694] [cursor=pointer]:
+              - generic [ref=e695]: defect
+              - generic [ref=e696]: 730:35
+              - generic [ref=e697]: click 70%
+            - generic [ref=e698] [cursor=pointer]:
+              - generic [ref=e699]: defect
+              - generic [ref=e700]: 733:57
+              - generic [ref=e701]: click 68%
+            - generic [ref=e702] [cursor=pointer]:
+              - generic [ref=e703]: defect
+              - generic [ref=e704]: 736:14
+              - generic [ref=e705]: click 77%
+            - generic [ref=e706] [cursor=pointer]:
+              - generic [ref=e707]: defect
+              - generic [ref=e708]: 743:35
+              - generic [ref=e709]: click 68%
+            - generic [ref=e710] [cursor=pointer]:
+              - generic [ref=e711]: defect
+              - generic [ref=e712]: 744:46
+              - generic [ref=e713]: click 65%
+            - generic [ref=e714] [cursor=pointer]:
+              - generic [ref=e715]: defect
+              - generic [ref=e716]: 745:56
+              - generic [ref=e717]: click 78%
+            - generic [ref=e718] [cursor=pointer]:
+              - generic [ref=e719]: defect
+              - generic [ref=e720]: 751:53
+              - generic [ref=e721]: click 97%
+            - generic [ref=e722] [cursor=pointer]:
+              - generic [ref=e723]: defect
+              - generic [ref=e724]: 754:05
+              - generic [ref=e725]: click 74%
+            - generic [ref=e726] [cursor=pointer]:
+              - generic [ref=e727]: defect
+              - generic [ref=e728]: 786:43
+              - generic [ref=e729]: click 65%
+            - generic [ref=e730] [cursor=pointer]:
+              - generic [ref=e731]: defect
+              - generic [ref=e732]: 786:50
+              - generic [ref=e733]: click 71%
+            - generic [ref=e734] [cursor=pointer]:
+              - generic [ref=e735]: defect
+              - generic [ref=e736]: 787:28
+              - generic [ref=e737]: click 78%
+            - generic [ref=e738] [cursor=pointer]:
+              - generic [ref=e739]: defect
+              - generic [ref=e740]: 789:53
+              - generic [ref=e741]: click 76%
+            - generic [ref=e742] [cursor=pointer]:
+              - generic [ref=e743]: defect
+              - generic [ref=e744]: 790:37
+              - generic [ref=e745]: click 71%
+            - generic [ref=e746] [cursor=pointer]:
+              - generic [ref=e747]: defect
+              - generic [ref=e748]: 796:16
+              - generic [ref=e749]: click 66%
+            - generic [ref=e750] [cursor=pointer]:
+              - generic [ref=e751]: defect
+              - generic [ref=e752]: 799:55
+              - generic [ref=e753]: click 81%
+            - generic [ref=e754] [cursor=pointer]:
+              - generic [ref=e755]: defect
+              - generic [ref=e756]: 800:13
+              - generic [ref=e757]: click 68%
+            - generic [ref=e758] [cursor=pointer]:
+              - generic [ref=e759]: defect
+              - generic [ref=e760]: 800:42
+              - generic [ref=e761]: click 67%
+            - generic [ref=e762] [cursor=pointer]:
+              - generic [ref=e763]: defect
+              - generic [ref=e764]: 807:51
+              - generic [ref=e765]: click 74%
+            - generic [ref=e766] [cursor=pointer]:
+              - generic [ref=e767]: defect
+              - generic [ref=e768]: 810:58
+              - generic [ref=e769]: click 67%
+            - generic [ref=e770] [cursor=pointer]:
+              - generic [ref=e771]: defect
+              - generic [ref=e772]: 819:30
+              - generic [ref=e773]: click 72%
+            - generic [ref=e774] [cursor=pointer]:
+              - generic [ref=e775]: defect
+              - generic [ref=e776]: 829:05
+              - generic [ref=e777]: click 67%
+            - generic [ref=e778] [cursor=pointer]:
+              - generic [ref=e779]: defect
+              - generic [ref=e780]: 858:22
+              - generic [ref=e781]: click 88%
+            - generic [ref=e782] [cursor=pointer]:
+              - generic [ref=e783]: transient
+              - generic [ref=e784]: 870:27
+              - generic [ref=e785]: tonalOnset 100%
+            - generic [ref=e786] [cursor=pointer]:
+              - generic [ref=e787]: defect
+              - generic [ref=e788]: 886:45
+              - generic [ref=e789]: click 70%
+            - generic [ref=e790] [cursor=pointer]:
+              - generic [ref=e791]: defect
+              - generic [ref=e792]: 894:33
+              - generic [ref=e793]: click 71%
+            - generic [ref=e794] [cursor=pointer]:
+              - generic [ref=e795]: defect
+              - generic [ref=e796]: 922:51
+              - generic [ref=e797]: click 65%
+            - generic [ref=e798] [cursor=pointer]:
+              - generic [ref=e799]: defect
+              - generic [ref=e800]: 950:17
+              - generic [ref=e801]: click 67%
+            - generic [ref=e802] [cursor=pointer]:
+              - generic [ref=e803]: defect
+              - generic [ref=e804]: 953:19
+              - generic [ref=e805]: click 71%
+            - generic [ref=e806] [cursor=pointer]:
+              - generic [ref=e807]: defect
+              - generic [ref=e808]: 963:31
+              - generic [ref=e809]: click 65%
+            - generic [ref=e810] [cursor=pointer]:
+              - generic [ref=e811]: defect
+              - generic [ref=e812]: 988:30
+              - generic [ref=e813]: click 75%
+            - generic [ref=e814] [cursor=pointer]:
+              - generic [ref=e815]: defect
+              - generic [ref=e816]: 990:12
+              - generic [ref=e817]: click 71%
+            - generic [ref=e818] [cursor=pointer]:
+              - generic [ref=e819]: transient
+              - generic [ref=e820]: 1009:09
+              - generic [ref=e821]: tonalOnset 100%
+            - generic [ref=e822] [cursor=pointer]:
+              - generic [ref=e823]: defect
+              - generic [ref=e824]: 1013:24
+              - generic [ref=e825]: click 65%
+            - generic [ref=e826] [cursor=pointer]:
+              - generic [ref=e827]: defect
+              - generic [ref=e828]: 1016:47
+              - generic [ref=e829]: click 96%
+            - generic [ref=e830] [cursor=pointer]:
+              - generic [ref=e831]: defect
+              - generic [ref=e832]: 1017:05
+              - generic [ref=e833]: click 69%
+            - generic [ref=e834] [cursor=pointer]:
+              - generic [ref=e835]: defect
+              - generic [ref=e836]: 1021:38
+              - generic [ref=e837]: click 73%
+            - generic [ref=e838] [cursor=pointer]:
+              - generic [ref=e839]: defect
+              - generic [ref=e840]: 1021:41
+              - generic [ref=e841]: click 65%
+            - generic [ref=e842] [cursor=pointer]:
+              - generic [ref=e843]: defect
+              - generic [ref=e844]: 1026:35
+              - generic [ref=e845]: click 67%
+            - generic [ref=e846] [cursor=pointer]:
+              - generic [ref=e847]: defect
+              - generic [ref=e848]: 1031:13
+              - generic [ref=e849]: click 69%
+            - generic [ref=e850] [cursor=pointer]:
+              - generic [ref=e851]: defect
+              - generic [ref=e852]: 1037:05
+              - generic [ref=e853]: click 70%
+            - generic [ref=e854] [cursor=pointer]:
+              - generic [ref=e855]: defect
+              - generic [ref=e856]: 1038:28
+              - generic [ref=e857]: click 65%
+            - generic [ref=e858] [cursor=pointer]:
+              - generic [ref=e859]: defect
+              - generic [ref=e860]: 1040:08
+              - generic [ref=e861]: click 72%
+            - generic [ref=e862] [cursor=pointer]:
+              - generic [ref=e863]: defect
+              - generic [ref=e864]: 1041:12
+              - generic [ref=e865]: click 83%
+            - generic [ref=e866] [cursor=pointer]:
+              - generic [ref=e867]: defect
+              - generic [ref=e868]: 1042:37
+              - generic [ref=e869]: click 73%
+            - generic [ref=e870] [cursor=pointer]:
+              - generic [ref=e871]: defect
+              - generic [ref=e872]: 1042:56
+              - generic [ref=e873]: click 71%
+            - generic [ref=e874] [cursor=pointer]:
+              - generic [ref=e875]: defect
+              - generic [ref=e876]: 1043:34
+              - generic [ref=e877]: click 71%
+            - generic [ref=e878] [cursor=pointer]:
+              - generic [ref=e879]: defect
+              - generic [ref=e880]: 1046:18
+              - generic [ref=e881]: click 69%
+            - generic [ref=e882] [cursor=pointer]:
+              - generic [ref=e883]: defect
+              - generic [ref=e884]: 1046:24
+              - generic [ref=e885]: click 66%
+            - generic [ref=e886] [cursor=pointer]:
+              - generic [ref=e887]: defect
+              - generic [ref=e888]: 1046:43
+              - generic [ref=e889]: click 68%
+            - generic [ref=e890] [cursor=pointer]:
+              - generic [ref=e891]: defect
+              - generic [ref=e892]: 1050:39
+              - generic [ref=e893]: click 77%
+            - generic [ref=e894] [cursor=pointer]:
+              - generic [ref=e895]: defect
+              - generic [ref=e896]: 1051:28
+              - generic [ref=e897]: click 79%
+            - generic [ref=e898] [cursor=pointer]:
+              - generic [ref=e899]: defect
+              - generic [ref=e900]: 1056:28
+              - generic [ref=e901]: click 77%
+            - generic [ref=e902] [cursor=pointer]:
+              - generic [ref=e903]: defect
+              - generic [ref=e904]: 1056:42
+              - generic [ref=e905]: click 82%
+            - generic [ref=e906] [cursor=pointer]:
+              - generic [ref=e907]: defect
+              - generic [ref=e908]: 1056:50
+              - generic [ref=e909]: click 100%
+            - generic [ref=e910] [cursor=pointer]:
+              - generic [ref=e911]: defect
+              - generic [ref=e912]: 1057:12
+              - generic [ref=e913]: click 72%
+            - generic [ref=e914] [cursor=pointer]:
+              - generic [ref=e915]: defect
+              - generic [ref=e916]: 1061:45
+              - generic [ref=e917]: click 81%
+            - generic [ref=e918] [cursor=pointer]:
+              - generic [ref=e919]: defect
+              - generic [ref=e920]: 1063:51
+              - generic [ref=e921]: click 74%
+            - generic [ref=e922] [cursor=pointer]:
+              - generic [ref=e923]: defect
+              - generic [ref=e924]: 1067:05
+              - generic [ref=e925]: click 77%
+            - generic [ref=e926] [cursor=pointer]:
+              - generic [ref=e927]: defect
+              - generic [ref=e928]: 1067:14
+              - generic [ref=e929]: click 77%
+            - generic [ref=e930] [cursor=pointer]:
+              - generic [ref=e931]: defect
+              - generic [ref=e932]: 1071:38
+              - generic [ref=e933]: click 93%
+            - generic [ref=e934] [cursor=pointer]:
+              - generic [ref=e935]: defect
+              - generic [ref=e936]: 1072:04
+              - generic [ref=e937]: click 90%
+            - generic [ref=e938] [cursor=pointer]:
+              - generic [ref=e939]: defect
+              - generic [ref=e940]: 1091:19
+              - generic [ref=e941]: click 83%
+            - generic [ref=e942] [cursor=pointer]:
+              - generic [ref=e943]: defect
+              - generic [ref=e944]: 1091:38
+              - generic [ref=e945]: click 70%
+            - generic [ref=e946] [cursor=pointer]:
+              - generic [ref=e947]: defect
+              - generic [ref=e948]: 1093:13
+              - generic [ref=e949]: click 66%
+            - generic [ref=e950] [cursor=pointer]:
+              - generic [ref=e951]: defect
+              - generic [ref=e952]: 1095:46
+              - generic [ref=e953]: click 74%
+            - generic [ref=e954] [cursor=pointer]:
+              - generic [ref=e955]: defect
+              - generic [ref=e956]: 1095:54
+              - generic [ref=e957]: click 70%
+            - generic [ref=e958] [cursor=pointer]:
+              - generic [ref=e959]: defect
+              - generic [ref=e960]: 1096:01
+              - generic [ref=e961]: click 80%
+            - generic [ref=e962] [cursor=pointer]:
+              - generic [ref=e963]: transient
+              - generic [ref=e964]: 1097:37
+              - generic [ref=e965]: tonalOnset 99%
+            - generic [ref=e966] [cursor=pointer]:
+              - generic [ref=e967]: defect
+              - generic [ref=e968]: 1097:51
+              - generic [ref=e969]: click 93%
+            - generic [ref=e970] [cursor=pointer]:
+              - generic [ref=e971]: defect
+              - generic [ref=e972]: 1100:46
+              - generic [ref=e973]: click 91%
+            - generic [ref=e974] [cursor=pointer]:
+              - generic [ref=e975]: defect
+              - generic [ref=e976]: 1105:31
+              - generic [ref=e977]: click 90%
+            - generic [ref=e978] [cursor=pointer]:
+              - generic [ref=e979]: defect
+              - generic [ref=e980]: 1105:37
+              - generic [ref=e981]: click 74%
+            - generic [ref=e982] [cursor=pointer]:
+              - generic [ref=e983]: defect
+              - generic [ref=e984]: 1110:14
+              - generic [ref=e985]: click 81%
+            - generic [ref=e986] [cursor=pointer]:
+              - generic [ref=e987]: defect
+              - generic [ref=e988]: 1114:53
+              - generic [ref=e989]: click 83%
+            - generic [ref=e990] [cursor=pointer]:
+              - generic [ref=e991]: transient
+              - generic [ref=e992]: 1115:33
+              - generic [ref=e993]: tonalOnset 98%
+            - generic [ref=e994] [cursor=pointer]:
+              - generic [ref=e995]: defect
+              - generic [ref=e996]: 1117:29
+              - generic [ref=e997]: click 70%
+            - generic [ref=e998] [cursor=pointer]:
+              - generic [ref=e999]: defect
+              - generic [ref=e1000]: 1119:42
+              - generic [ref=e1001]: click 97%
+            - generic [ref=e1002] [cursor=pointer]:
+              - generic [ref=e1003]: defect
+              - generic [ref=e1004]: 1119:57
+              - generic [ref=e1005]: click 66%
+            - generic [ref=e1006] [cursor=pointer]:
+              - generic [ref=e1007]: defect
+              - generic [ref=e1008]: 1129:27
+              - generic [ref=e1009]: click 100%
+            - generic [ref=e1010] [cursor=pointer]:
+              - generic [ref=e1011]: defect
+              - generic [ref=e1012]: 1134:13
+              - generic [ref=e1013]: click 68%
+            - generic [ref=e1014] [cursor=pointer]:
+              - generic [ref=e1015]: defect
+              - generic [ref=e1016]: 1134:19
+              - generic [ref=e1017]: click 77%
+            - generic [ref=e1018] [cursor=pointer]:
+              - generic [ref=e1019]: defect
+              - generic [ref=e1020]: 1134:50
+              - generic [ref=e1021]: click 70%
+            - generic [ref=e1022] [cursor=pointer]:
+              - generic [ref=e1023]: defect
+              - generic [ref=e1024]: 1136:28
+              - generic [ref=e1025]: click 73%
+            - generic [ref=e1026] [cursor=pointer]:
+              - generic [ref=e1027]: defect
+              - generic [ref=e1028]: 1136:38
+              - generic [ref=e1029]: click 95%
+            - generic [ref=e1030] [cursor=pointer]:
+              - generic [ref=e1031]: defect
+              - generic [ref=e1032]: 1139:05
+              - generic [ref=e1033]: click 97%
+            - generic [ref=e1034] [cursor=pointer]:
+              - generic [ref=e1035]: defect
+              - generic [ref=e1036]: 1141:29
+              - generic [ref=e1037]: click 79%
+            - generic [ref=e1038] [cursor=pointer]:
+              - generic [ref=e1039]: defect
+              - generic [ref=e1040]: 1141:37
+              - generic [ref=e1041]: click 97%
+            - generic [ref=e1042] [cursor=pointer]:
+              - generic [ref=e1043]: defect
+              - generic [ref=e1044]: 1144:18
+              - generic [ref=e1045]: click 71%
+            - generic [ref=e1046] [cursor=pointer]:
+              - generic [ref=e1047]: defect
+              - generic [ref=e1048]: 1146:25
+              - generic [ref=e1049]: click 90%
+            - generic [ref=e1050] [cursor=pointer]:
+              - generic [ref=e1051]: defect
+              - generic [ref=e1052]: 1146:43
+              - generic [ref=e1053]: click 94%
+            - generic [ref=e1054] [cursor=pointer]:
+              - generic [ref=e1055]: defect
+              - generic [ref=e1056]: 1148:57
+              - generic [ref=e1057]: click 78%
+            - generic [ref=e1058] [cursor=pointer]:
+              - generic [ref=e1059]: defect
+              - generic [ref=e1060]: 1149:02
+              - generic [ref=e1061]: click 81%
+            - generic [ref=e1062] [cursor=pointer]:
+              - generic [ref=e1063]: defect
+              - generic [ref=e1064]: 1151:22
+              - generic [ref=e1065]: click 67%
+            - generic [ref=e1066] [cursor=pointer]:
+              - generic [ref=e1067]: defect
+              - generic [ref=e1068]: 1151:31
+              - generic [ref=e1069]: click 89%
+            - generic [ref=e1070] [cursor=pointer]:
+              - generic [ref=e1071]: defect
+              - generic [ref=e1072]: 1154:03
+              - generic [ref=e1073]: click 70%
+            - generic [ref=e1074] [cursor=pointer]:
+              - generic [ref=e1075]: defect
+              - generic [ref=e1076]: 1156:22
+              - generic [ref=e1077]: click 70%
+            - generic [ref=e1078] [cursor=pointer]:
+              - generic [ref=e1079]: defect
+              - generic [ref=e1080]: 1159:01
+              - generic [ref=e1081]: click 77%
+            - generic [ref=e1082] [cursor=pointer]:
+              - generic [ref=e1083]: defect
+              - generic [ref=e1084]: 1159:12
+              - generic [ref=e1085]: click 83%
+            - generic [ref=e1086] [cursor=pointer]:
+              - generic [ref=e1087]: defect
+              - generic [ref=e1088]: 1164:05
+              - generic [ref=e1089]: click 100%
+            - generic [ref=e1090] [cursor=pointer]:
+              - generic [ref=e1091]: transient
+              - generic [ref=e1092]: 1171:32
+              - generic [ref=e1093]: tonalOnset 99%
+            - generic [ref=e1094] [cursor=pointer]:
+              - generic [ref=e1095]: defect
+              - generic [ref=e1096]: 1175:01
+              - generic [ref=e1097]: click 100%
+            - generic [ref=e1098] [cursor=pointer]:
+              - generic [ref=e1099]: defect
+              - generic [ref=e1100]: 1187:55
+              - generic [ref=e1101]: click 83%
+            - generic [ref=e1102] [cursor=pointer]:
+              - generic [ref=e1103]: defect
+              - generic [ref=e1104]: 1190:12
+              - generic [ref=e1105]: click 73%
+            - generic [ref=e1106] [cursor=pointer]:
+              - generic [ref=e1107]: defect
+              - generic [ref=e1108]: 1191:44
+              - generic [ref=e1109]: click 68%
+            - generic [ref=e1110] [cursor=pointer]:
+              - generic [ref=e1111]: defect
+              - generic [ref=e1112]: 1195:48
+              - generic [ref=e1113]: click 80%
+            - generic [ref=e1114] [cursor=pointer]:
+              - generic [ref=e1115]: defect
+              - generic [ref=e1116]: 1197:24
+              - generic [ref=e1117]: click 69%
+            - generic [ref=e1118] [cursor=pointer]:
+              - generic [ref=e1119]: defect
+              - generic [ref=e1120]: 1199:27
+              - generic [ref=e1121]: click 70%
+            - generic [ref=e1122] [cursor=pointer]:
+              - generic [ref=e1123]: defect
+              - generic [ref=e1124]: 1201:29
+              - generic [ref=e1125]: click 67%
+            - generic [ref=e1126] [cursor=pointer]:
+              - generic [ref=e1127]: defect
+              - generic [ref=e1128]: 1203:12
+              - generic [ref=e1129]: click 65%
+            - generic [ref=e1130] [cursor=pointer]:
+              - generic [ref=e1131]: defect
+              - generic [ref=e1132]: 1204:58
+              - generic [ref=e1133]: click 72%
+            - generic [ref=e1134] [cursor=pointer]:
+              - generic [ref=e1135]: defect
+              - generic [ref=e1136]: 1208:57
+              - generic [ref=e1137]: click 71%
+            - generic [ref=e1138] [cursor=pointer]:
+              - generic [ref=e1139]: defect
+              - generic [ref=e1140]: 1212:46
+              - generic [ref=e1141]: click 66%
+            - generic [ref=e1142] [cursor=pointer]:
+              - generic [ref=e1143]: defect
+              - generic [ref=e1144]: 1212:52
+              - generic [ref=e1145]: click 71%
+            - generic [ref=e1146] [cursor=pointer]:
+              - generic [ref=e1147]: defect
+              - generic [ref=e1148]: 1214:48
+              - generic [ref=e1149]: click 69%
+            - generic [ref=e1150] [cursor=pointer]:
+              - generic [ref=e1151]: defect
+              - generic [ref=e1152]: 1216:36
+              - generic [ref=e1153]: click 67%
+            - generic [ref=e1154] [cursor=pointer]:
+              - generic [ref=e1155]: defect
+              - generic [ref=e1156]: 1220:30
+              - generic [ref=e1157]: click 70%
+            - generic [ref=e1158] [cursor=pointer]:
+              - generic [ref=e1159]: defect
+              - generic [ref=e1160]: 1222:25
+              - generic [ref=e1161]: click 79%
+            - generic [ref=e1162] [cursor=pointer]:
+              - generic [ref=e1163]: defect
+              - generic [ref=e1164]: 1226:15
+              - generic [ref=e1165]: click 73%
+            - generic [ref=e1166] [cursor=pointer]:
+              - generic [ref=e1167]: defect
+              - generic [ref=e1168]: 1228:11
+              - generic [ref=e1169]: click 98%
+            - generic [ref=e1170] [cursor=pointer]:
+              - generic [ref=e1171]: defect
+              - generic [ref=e1172]: 1228:14
+              - generic [ref=e1173]: click 66%
+            - generic [ref=e1174] [cursor=pointer]:
+              - generic [ref=e1175]: defect
+              - generic [ref=e1176]: 1230:05
+              - generic [ref=e1177]: click 72%
+            - generic [ref=e1178] [cursor=pointer]:
+              - generic [ref=e1179]: defect
+              - generic [ref=e1180]: 1230:10
+              - generic [ref=e1181]: click 75%
+            - generic [ref=e1182] [cursor=pointer]:
+              - generic [ref=e1183]: defect
+              - generic [ref=e1184]: 1232:01
+              - generic [ref=e1185]: click 79%
+            - generic [ref=e1186] [cursor=pointer]:
+              - generic [ref=e1187]: defect
+              - generic [ref=e1188]: 1232:06
+              - generic [ref=e1189]: click 100%
+            - generic [ref=e1190] [cursor=pointer]:
+              - generic [ref=e1191]: defect
+              - generic [ref=e1192]: 1233:55
+              - generic [ref=e1193]: click 69%
+            - generic [ref=e1194] [cursor=pointer]:
+              - generic [ref=e1195]: defect
+              - generic [ref=e1196]: 1235:50
+              - generic [ref=e1197]: click 70%
+            - generic [ref=e1198] [cursor=pointer]:
+              - generic [ref=e1199]: defect
+              - generic [ref=e1200]: 1237:46
+              - generic [ref=e1201]: click 69%
+            - generic [ref=e1202] [cursor=pointer]:
+              - generic [ref=e1203]: defect
+              - generic [ref=e1204]: 1239:42
+              - generic [ref=e1205]: click 73%
+            - generic [ref=e1206] [cursor=pointer]:
+              - generic [ref=e1207]: defect
+              - generic [ref=e1208]: 1241:37
+              - generic [ref=e1209]: click 70%
+            - generic [ref=e1210] [cursor=pointer]:
+              - generic [ref=e1211]: defect
+              - generic [ref=e1212]: 1243:31
+              - generic [ref=e1213]: click 65%
+            - generic [ref=e1214] [cursor=pointer]:
+              - generic [ref=e1215]: defect
+              - generic [ref=e1216]: 1247:22
+              - generic [ref=e1217]: click 77%
+            - generic [ref=e1218] [cursor=pointer]:
+              - generic [ref=e1219]: defect
+              - generic [ref=e1220]: 1247:32
+              - generic [ref=e1221]: click 78%
+            - generic [ref=e1222] [cursor=pointer]:
+              - generic [ref=e1223]: defect
+              - generic [ref=e1224]: 1251:27
+              - generic [ref=e1225]: click 77%
+            - generic [ref=e1226] [cursor=pointer]:
+              - generic [ref=e1227]: defect
+              - generic [ref=e1228]: 1253:04
+              - generic [ref=e1229]: click 67%
+            - generic [ref=e1230] [cursor=pointer]:
+              - generic [ref=e1231]: defect
+              - generic [ref=e1232]: 1253:07
+              - generic [ref=e1233]: click 66%
+            - generic [ref=e1234] [cursor=pointer]:
+              - generic [ref=e1235]: defect
+              - generic [ref=e1236]: 1260:55
+              - generic [ref=e1237]: click 73%
+            - generic [ref=e1238] [cursor=pointer]:
+              - generic [ref=e1239]: defect
+              - generic [ref=e1240]: 1262:40
+              - generic [ref=e1241]: click 65%
+            - generic [ref=e1242] [cursor=pointer]:
+              - generic [ref=e1243]: defect
+              - generic [ref=e1244]: 1262:57
+              - generic [ref=e1245]: click 84%
+            - generic [ref=e1246] [cursor=pointer]:
+              - generic [ref=e1247]: defect
+              - generic [ref=e1248]: 1264:51
+              - generic [ref=e1249]: click 78%
+            - generic [ref=e1250] [cursor=pointer]:
+              - generic [ref=e1251]: defect
+              - generic [ref=e1252]: 1266:43
+              - generic [ref=e1253]: click 67%
+            - generic [ref=e1254] [cursor=pointer]:
+              - generic [ref=e1255]: defect
+              - generic [ref=e1256]: 1266:47
+              - generic [ref=e1257]: click 71%
+            - generic [ref=e1258] [cursor=pointer]:
+              - generic [ref=e1259]: defect
+              - generic [ref=e1260]: 1268:42
+              - generic [ref=e1261]: click 93%
+            - generic [ref=e1262] [cursor=pointer]:
+              - generic [ref=e1263]: defect
+              - generic [ref=e1264]: 1274:30
+              - generic [ref=e1265]: click 66%
+            - generic [ref=e1266] [cursor=pointer]:
+              - generic [ref=e1267]: defect
+              - generic [ref=e1268]: 1274:34
+              - generic [ref=e1269]: click 74%
+            - generic [ref=e1270] [cursor=pointer]:
+              - generic [ref=e1271]: defect
+              - generic [ref=e1272]: 1278:09
+              - generic [ref=e1273]: click 75%
+            - generic [ref=e1274] [cursor=pointer]:
+              - generic [ref=e1275]: defect
+              - generic [ref=e1276]: 1280:03
+              - generic [ref=e1277]: click 74%
+            - generic [ref=e1278] [cursor=pointer]:
+              - generic [ref=e1279]: defect
+              - generic [ref=e1280]: 1282:00
+              - generic [ref=e1281]: click 84%
+            - generic [ref=e1282] [cursor=pointer]:
+              - generic [ref=e1283]: defect
+              - generic [ref=e1284]: 1282:12
+              - generic [ref=e1285]: click 68%
+            - generic [ref=e1286] [cursor=pointer]:
+              - generic [ref=e1287]: defect
+              - generic [ref=e1288]: 1283:56
+              - generic [ref=e1289]: click 72%
+            - generic [ref=e1290] [cursor=pointer]:
+              - generic [ref=e1291]: transient
+              - generic [ref=e1292]: 1287:43
+              - generic [ref=e1293]: tonalOnset 99%
+            - generic [ref=e1294] [cursor=pointer]:
+              - generic [ref=e1295]: beat
+              - generic [ref=e1296]: 1289:13
+            - generic [ref=e1298] [cursor=pointer]:
+              - generic [ref=e1299]: defect
+              - generic [ref=e1300]: 1293:33
+              - generic [ref=e1301]: click 74%
+            - generic [ref=e1302] [cursor=pointer]:
+              - generic [ref=e1303]: defect
+              - generic [ref=e1304]: 1295:32
+              - generic [ref=e1305]: click 81%
+            - generic [ref=e1306] [cursor=pointer]:
+              - generic [ref=e1307]: defect
+              - generic [ref=e1308]: 1295:42
+              - generic [ref=e1309]: click 73%
+            - generic [ref=e1310] [cursor=pointer]:
+              - generic [ref=e1311]: defect
+              - generic [ref=e1312]: 1297:37
+              - generic [ref=e1313]: click 70%
+            - generic [ref=e1314] [cursor=pointer]:
+              - generic [ref=e1315]: defect
+              - generic [ref=e1316]: 1299:31
+              - generic [ref=e1317]: click 69%
+            - generic [ref=e1318] [cursor=pointer]:
+              - generic [ref=e1319]: defect
+              - generic [ref=e1320]: 1303:21
+              - generic [ref=e1321]: click 93%
+            - generic [ref=e1322] [cursor=pointer]:
+              - generic [ref=e1323]: defect
+              - generic [ref=e1324]: 1305:01
+              - generic [ref=e1325]: click 64%
+            - generic [ref=e1326] [cursor=pointer]:
+              - generic [ref=e1327]: defect
+              - generic [ref=e1328]: 1307:12
+              - generic [ref=e1329]: click 86%
+            - generic [ref=e1330] [cursor=pointer]:
+              - generic [ref=e1331]: defect
+              - generic [ref=e1332]: 1307:46
+              - generic [ref=e1333]: click 64%
+            - generic [ref=e1334] [cursor=pointer]:
+              - generic [ref=e1335]: defect
+              - generic [ref=e1336]: 1308:52
+              - generic [ref=e1337]: click 70%
+            - generic [ref=e1338] [cursor=pointer]:
+              - generic [ref=e1339]: defect
+              - generic [ref=e1340]: 1311:04
+              - generic [ref=e1341]: click 73%
+            - generic [ref=e1342] [cursor=pointer]:
+              - generic [ref=e1343]: defect
+              - generic [ref=e1344]: 1313:00
+              - generic [ref=e1345]: click 77%
+            - generic [ref=e1346] [cursor=pointer]:
+              - generic [ref=e1347]: defect
+              - generic [ref=e1348]: 1318:51
+              - generic [ref=e1349]: click 65%
+            - generic [ref=e1350] [cursor=pointer]:
+              - generic [ref=e1351]: defect
+              - generic [ref=e1352]: 1320:27
+              - generic [ref=e1353]: click 67%
+            - generic [ref=e1354] [cursor=pointer]:
+              - generic [ref=e1355]: defect
+              - generic [ref=e1356]: 1322:42
+              - generic [ref=e1357]: click 65%
+            - generic [ref=e1358] [cursor=pointer]:
+              - generic [ref=e1359]: defect
+              - generic [ref=e1360]: 1324:08
+              - generic [ref=e1361]: click 67%
+            - generic [ref=e1362] [cursor=pointer]:
+              - generic [ref=e1363]: defect
+              - generic [ref=e1364]: 1324:18
+              - generic [ref=e1365]: click 89%
+            - generic [ref=e1366] [cursor=pointer]:
+              - generic [ref=e1367]: defect
+              - generic [ref=e1368]: 1324:34
+              - generic [ref=e1369]: click 72%
+            - generic [ref=e1370] [cursor=pointer]:
+              - generic [ref=e1371]: defect
+              - generic [ref=e1372]: 1328:09
+              - generic [ref=e1373]: click 76%
+            - generic [ref=e1374] [cursor=pointer]:
+              - generic [ref=e1375]: defect
+              - generic [ref=e1376]: 1328:30
+              - generic [ref=e1377]: click 76%
+            - generic [ref=e1378] [cursor=pointer]:
+              - generic [ref=e1379]: defect
+              - generic [ref=e1380]: 1330:21
+              - generic [ref=e1381]: click 70%
+            - generic [ref=e1382] [cursor=pointer]:
+              - generic [ref=e1383]: defect
+              - generic [ref=e1384]: 1332:16
+              - generic [ref=e1385]: click 73%
+            - generic [ref=e1386] [cursor=pointer]:
+              - generic [ref=e1387]: defect
+              - generic [ref=e1388]: 1334:12
+              - generic [ref=e1389]: click 93%
+            - generic [ref=e1390] [cursor=pointer]:
+              - generic [ref=e1391]: defect
+              - generic [ref=e1392]: 1344:04
+              - generic [ref=e1393]: click 68%
+            - generic [ref=e1394] [cursor=pointer]:
+              - generic [ref=e1395]: defect
+              - generic [ref=e1396]: 1347:42
+              - generic [ref=e1397]: click 82%
+            - generic [ref=e1398] [cursor=pointer]:
+              - generic [ref=e1399]: defect
+              - generic [ref=e1400]: 1349:21
+              - generic [ref=e1401]: click 81%
+            - generic [ref=e1402] [cursor=pointer]:
+              - generic [ref=e1403]: defect
+              - generic [ref=e1404]: 1351:10
+              - generic [ref=e1405]: click 75%
+            - generic [ref=e1406] [cursor=pointer]:
+              - generic [ref=e1407]: defect
+              - generic [ref=e1408]: 1357:36
+              - generic [ref=e1409]: click 66%
+            - generic [ref=e1410] [cursor=pointer]:
+              - generic [ref=e1411]: defect
+              - generic [ref=e1412]: 1359:21
+              - generic [ref=e1413]: click 75%
+            - generic [ref=e1414] [cursor=pointer]:
+              - generic [ref=e1415]: defect
+              - generic [ref=e1416]: 1370:29
+              - generic [ref=e1417]: click 65%
+            - generic [ref=e1418] [cursor=pointer]:
+              - generic [ref=e1419]: defect
+              - generic [ref=e1420]: 1372:47
+              - generic [ref=e1421]: click 72%
+            - generic [ref=e1422] [cursor=pointer]:
+              - generic [ref=e1423]: defect
+              - generic [ref=e1424]: 1373:11
+              - generic [ref=e1425]: click 77%
+            - generic [ref=e1426] [cursor=pointer]:
+              - generic [ref=e1427]: defect
+              - generic [ref=e1428]: 1387:51
+              - generic [ref=e1429]: click 69%
+            - generic [ref=e1430] [cursor=pointer]:
+              - generic [ref=e1431]: defect
+              - generic [ref=e1432]: 1396:04
+              - generic [ref=e1433]: click 72%
+            - generic [ref=e1434] [cursor=pointer]:
+              - generic [ref=e1435]: defect
+              - generic [ref=e1436]: 1396:17
+              - generic [ref=e1437]: click 66%
+            - generic [ref=e1438] [cursor=pointer]:
+              - generic [ref=e1439]: defect
+              - generic [ref=e1440]: 1401:04
+              - generic [ref=e1441]: click 74%
+            - generic [ref=e1442] [cursor=pointer]:
+              - generic [ref=e1443]: defect
+              - generic [ref=e1444]: 1403:51
+              - generic [ref=e1445]: click 64%
+            - generic [ref=e1446] [cursor=pointer]:
+              - generic [ref=e1447]: defect
+              - generic [ref=e1448]: 1408:59
+              - generic [ref=e1449]: click 79%
+            - generic [ref=e1450] [cursor=pointer]:
+              - generic [ref=e1451]: defect
+              - generic [ref=e1452]: 1414:16
+              - generic [ref=e1453]: click 67%
+            - generic [ref=e1454] [cursor=pointer]:
+              - generic [ref=e1455]: transient
+              - generic [ref=e1456]: 1434:15
+              - generic [ref=e1457]: tonalOnset 100%
+            - generic [ref=e1458] [cursor=pointer]:
+              - generic [ref=e1459]: defect
+              - generic [ref=e1460]: 1444:21
+              - generic [ref=e1461]: click 69%
+            - generic [ref=e1462] [cursor=pointer]:
+              - generic [ref=e1463]: defect
+              - generic [ref=e1464]: 1447:23
+              - generic [ref=e1465]: click 78%
+            - generic [ref=e1466] [cursor=pointer]:
+              - generic [ref=e1467]: defect
+              - generic [ref=e1468]: 1449:21
+              - generic [ref=e1469]: click 80%
+            - generic [ref=e1470] [cursor=pointer]:
+              - generic [ref=e1471]: defect
+              - generic [ref=e1472]: 1452:28
+              - generic [ref=e1473]: click 82%
+            - generic [ref=e1474] [cursor=pointer]:
+              - generic [ref=e1475]: defect
+              - generic [ref=e1476]: 1453:22
+              - generic [ref=e1477]: click 83%
+            - generic [ref=e1478] [cursor=pointer]:
+              - generic [ref=e1479]: defect
+              - generic [ref=e1480]: 1456:44
+              - generic [ref=e1481]: click 82%
+            - generic [ref=e1482] [cursor=pointer]:
+              - generic [ref=e1483]: defect
+              - generic [ref=e1484]: 1457:14
+              - generic [ref=e1485]: click 73%
+            - generic [ref=e1486] [cursor=pointer]:
+              - generic [ref=e1487]: defect
+              - generic [ref=e1488]: 1462:02
+              - generic [ref=e1489]: click 71%
+            - generic [ref=e1490] [cursor=pointer]:
+              - generic [ref=e1491]: defect
+              - generic [ref=e1492]: 1469:26
+              - generic [ref=e1493]: click 71%
+            - generic [ref=e1494] [cursor=pointer]:
+              - generic [ref=e1495]: defect
+              - generic [ref=e1496]: 1478:45
+              - generic [ref=e1497]: click 77%
+            - generic [ref=e1498] [cursor=pointer]:
+              - generic [ref=e1499]: defect
+              - generic [ref=e1500]: 1482:51
+              - generic [ref=e1501]: click 66%
+            - generic [ref=e1502] [cursor=pointer]:
+              - generic [ref=e1503]: defect
+              - generic [ref=e1504]: 1500:03
+              - generic [ref=e1505]: click 68%
+            - generic [ref=e1506] [cursor=pointer]:
+              - generic [ref=e1507]: transient
+              - generic [ref=e1508]: 1508:26
+              - generic [ref=e1509]: tonalOnset 98%
+            - generic [ref=e1510] [cursor=pointer]:
+              - generic [ref=e1511]: defect
+              - generic [ref=e1512]: 1522:51
+              - generic [ref=e1513]: click 70%
+            - generic [ref=e1514] [cursor=pointer]:
+              - generic [ref=e1515]: defect
+              - generic [ref=e1516]: 1524:26
+              - generic [ref=e1517]: click 67%
+            - generic [ref=e1518] [cursor=pointer]:
+              - generic [ref=e1519]: defect
+              - generic [ref=e1520]: 1537:09
+              - generic [ref=e1521]: click 70%
+            - generic [ref=e1522] [cursor=pointer]:
+              - generic [ref=e1523]: defect
+              - generic [ref=e1524]: 1537:42
+              - generic [ref=e1525]: click 64%
+            - generic [ref=e1526] [cursor=pointer]:
+              - generic [ref=e1527]: defect
+              - generic [ref=e1528]: 1544:45
+              - generic [ref=e1529]: click 65%
+            - generic [ref=e1530] [cursor=pointer]:
+              - generic [ref=e1531]: defect
+              - generic [ref=e1532]: 1545:03
+              - generic [ref=e1533]: click 89%
+            - generic [ref=e1534] [cursor=pointer]:
+              - generic [ref=e1535]: defect
+              - generic [ref=e1536]: 1549:06
+              - generic [ref=e1537]: click 83%
+            - generic [ref=e1538] [cursor=pointer]:
+              - generic [ref=e1539]: defect
+              - generic [ref=e1540]: 1551:09
+              - generic [ref=e1541]: click 66%
+            - generic [ref=e1542] [cursor=pointer]:
+              - generic [ref=e1543]: defect
+              - generic [ref=e1544]: 1553:10
+              - generic [ref=e1545]: click 75%
+            - generic [ref=e1546] [cursor=pointer]:
+              - generic [ref=e1547]: defect
+              - generic [ref=e1548]: 1561:17
+              - generic [ref=e1549]: click 74%
+            - generic [ref=e1550] [cursor=pointer]:
+              - generic [ref=e1551]: defect
+              - generic [ref=e1552]: 1564:12
+              - generic [ref=e1553]: click 65%
+            - generic [ref=e1554] [cursor=pointer]:
+              - generic [ref=e1555]: defect
+              - generic [ref=e1556]: 1569:39
+              - generic [ref=e1557]: click 67%
+            - generic [ref=e1558] [cursor=pointer]:
+              - generic [ref=e1559]: defect
+              - generic [ref=e1560]: 1569:58
+              - generic [ref=e1561]: click 69%
+            - generic [ref=e1562] [cursor=pointer]:
+              - generic [ref=e1563]: defect
+              - generic [ref=e1564]: 1581:57
+              - generic [ref=e1565]: click 70%
+            - generic [ref=e1566] [cursor=pointer]:
+              - generic [ref=e1567]: defect
+              - generic [ref=e1568]: 1582:09
+              - generic [ref=e1569]: click 70%
+            - generic [ref=e1570] [cursor=pointer]:
+              - generic [ref=e1571]: defect
+              - generic [ref=e1572]: 1583:59
+              - generic [ref=e1573]: click 76%
+            - generic [ref=e1574] [cursor=pointer]:
+              - generic [ref=e1575]: defect
+              - generic [ref=e1576]: 1585:54
+              - generic [ref=e1577]: click 74%
+            - generic [ref=e1578] [cursor=pointer]:
+              - generic [ref=e1579]: defect
+              - generic [ref=e1580]: 1587:57
+              - generic [ref=e1581]: click 98%
+            - generic [ref=e1582] [cursor=pointer]:
+              - generic [ref=e1583]: defect
+              - generic [ref=e1584]: 1589:59
+              - generic [ref=e1585]: click 79%
+            - generic [ref=e1586] [cursor=pointer]:
+              - generic [ref=e1587]: defect
+              - generic [ref=e1588]: 1590:05
+              - generic [ref=e1589]: click 82%
+            - generic [ref=e1590] [cursor=pointer]:
+              - generic [ref=e1591]: defect
+              - generic [ref=e1592]: 1590:19
+              - generic [ref=e1593]: click 65%
+            - generic [ref=e1594] [cursor=pointer]:
+              - generic [ref=e1595]: defect
+              - generic [ref=e1596]: 1592:03
+              - generic [ref=e1597]: click 65%
+            - generic [ref=e1598] [cursor=pointer]:
+              - generic [ref=e1599]: defect
+              - generic [ref=e1600]: 1592:22
+              - generic [ref=e1601]: click 74%
+            - generic [ref=e1602] [cursor=pointer]:
+              - generic [ref=e1603]: defect
+              - generic [ref=e1604]: 1594:11
+              - generic [ref=e1605]: click 66%
+            - generic [ref=e1606] [cursor=pointer]:
+              - generic [ref=e1607]: defect
+              - generic [ref=e1608]: 1594:24
+              - generic [ref=e1609]: click 87%
+            - generic [ref=e1610] [cursor=pointer]:
+              - generic [ref=e1611]: defect
+              - generic [ref=e1612]: 1600:22
+              - generic [ref=e1613]: click 74%
+            - generic [ref=e1614] [cursor=pointer]:
+              - generic [ref=e1615]: defect
+              - generic [ref=e1616]: 1602:24
+              - generic [ref=e1617]: click 65%
+            - generic [ref=e1618] [cursor=pointer]:
+              - generic [ref=e1619]: defect
+              - generic [ref=e1620]: 1604:26
+              - generic [ref=e1621]: click 67%
+            - generic [ref=e1622] [cursor=pointer]:
+              - generic [ref=e1623]: transient
+              - generic [ref=e1624]: 1605:32
+              - generic [ref=e1625]: tonalOnset 100%
+            - generic [ref=e1626] [cursor=pointer]:
+              - generic [ref=e1627]: defect
+              - generic [ref=e1628]: 1618:49
+              - generic [ref=e1629]: click 70%
+            - generic [ref=e1630] [cursor=pointer]:
+              - generic [ref=e1631]: defect
+              - generic [ref=e1632]: 1631:03
+              - generic [ref=e1633]: click 74%
+            - generic [ref=e1634] [cursor=pointer]:
+              - generic [ref=e1635]: defect
+              - generic [ref=e1636]: 1635:22
+              - generic [ref=e1637]: click 78%
+            - generic [ref=e1638] [cursor=pointer]:
+              - generic [ref=e1639]: defect
+              - generic [ref=e1640]: 1637:10
+              - generic [ref=e1641]: click 78%
+            - generic [ref=e1642] [cursor=pointer]:
+              - generic [ref=e1643]: defect
+              - generic [ref=e1644]: 1639:27
+              - generic [ref=e1645]: click 73%
+            - generic [ref=e1646] [cursor=pointer]:
+              - generic [ref=e1647]: defect
+              - generic [ref=e1648]: 1641:29
+              - generic [ref=e1649]: click 64%
+            - generic [ref=e1650] [cursor=pointer]:
+              - generic [ref=e1651]: defect
+              - generic [ref=e1652]: 1643:01
+              - generic [ref=e1653]: click 69%
+            - generic [ref=e1654] [cursor=pointer]:
+              - generic [ref=e1655]: defect
+              - generic [ref=e1656]: 1647:22
+              - generic [ref=e1657]: click 74%
+            - generic [ref=e1658] [cursor=pointer]:
+              - generic [ref=e1659]: defect
+              - generic [ref=e1660]: 1649:25
+              - generic [ref=e1661]: click 69%
+            - generic [ref=e1662] [cursor=pointer]:
+              - generic [ref=e1663]: defect
+              - generic [ref=e1664]: 1657:38
+              - generic [ref=e1665]: click 68%
+            - generic [ref=e1666] [cursor=pointer]:
+              - generic [ref=e1667]: defect
+              - generic [ref=e1668]: 1665:49
+              - generic [ref=e1669]: click 72%
+            - generic [ref=e1670] [cursor=pointer]:
+              - generic [ref=e1671]: defect
+              - generic [ref=e1672]: 1667:50
+              - generic [ref=e1673]: click 66%
+            - generic [ref=e1674] [cursor=pointer]:
+              - generic [ref=e1675]: defect
+              - generic [ref=e1676]: 1677:47
+              - generic [ref=e1677]: click 81%
+            - generic [ref=e1678] [cursor=pointer]:
+              - generic [ref=e1679]: defect
+              - generic [ref=e1680]: 1679:50
+              - generic [ref=e1681]: click 74%
+            - generic [ref=e1682] [cursor=pointer]:
+              - generic [ref=e1683]: defect
+              - generic [ref=e1684]: 1680:22
+              - generic [ref=e1685]: click 67%
+            - generic [ref=e1686] [cursor=pointer]:
+              - generic [ref=e1687]: defect
+              - generic [ref=e1688]: 1681:52
+              - generic [ref=e1689]: click 71%
+            - generic [ref=e1690] [cursor=pointer]:
+              - generic [ref=e1691]: defect
+              - generic [ref=e1692]: 1682:23
+              - generic [ref=e1693]: click 77%
+            - generic [ref=e1694] [cursor=pointer]:
+              - generic [ref=e1695]: defect
+              - generic [ref=e1696]: 1685:57
+              - generic [ref=e1697]: click 75%
+            - generic [ref=e1698] [cursor=pointer]:
+              - generic [ref=e1699]: defect
+              - generic [ref=e1700]: 1688:31
+              - generic [ref=e1701]: click 64%
+            - generic [ref=e1702] [cursor=pointer]:
+              - generic [ref=e1703]: defect
+              - generic [ref=e1704]: 1696:09
+              - generic [ref=e1705]: click 64%
+            - generic [ref=e1706] [cursor=pointer]:
+              - generic [ref=e1707]: defect
+              - generic [ref=e1708]: 1696:40
+              - generic [ref=e1709]: click 76%
+            - generic [ref=e1710] [cursor=pointer]:
+              - generic [ref=e1711]: defect
+              - generic [ref=e1712]: 1698:43
+              - generic [ref=e1713]: click 78%
+            - generic [ref=e1714] [cursor=pointer]:
+              - generic [ref=e1715]: defect
+              - generic [ref=e1716]: 1700:45
+              - generic [ref=e1717]: click 69%
+            - generic [ref=e1718] [cursor=pointer]:
+              - generic [ref=e1719]: defect
+              - generic [ref=e1720]: 1700:59
+              - generic [ref=e1721]: click 76%
+            - generic [ref=e1722] [cursor=pointer]:
+              - generic [ref=e1723]: defect
+              - generic [ref=e1724]: 1704:19
+              - generic [ref=e1725]: click 74%
+            - generic [ref=e1726] [cursor=pointer]:
+              - generic [ref=e1727]: transient
+              - generic [ref=e1728]: 1719:33
+              - generic [ref=e1729]: tonalOnset 100%
+            - generic [ref=e1730] [cursor=pointer]:
+              - generic [ref=e1731]: defect
+              - generic [ref=e1732]: 1729:10
+              - generic [ref=e1733]: click 72%
+            - generic [ref=e1734] [cursor=pointer]:
+              - generic [ref=e1735]: defect
+              - generic [ref=e1736]: 1729:24
+              - generic [ref=e1737]: click 67%
+            - generic [ref=e1738] [cursor=pointer]:
+              - generic [ref=e1739]: transient
+              - generic [ref=e1740]: 1755:16
+              - generic [ref=e1741]: tonalOnset 100%
+            - generic [ref=e1742] [cursor=pointer]:
+              - generic [ref=e1743]: defect
+              - generic [ref=e1744]: 1777:45
+              - generic [ref=e1745]: click 72%
+            - generic [ref=e1746] [cursor=pointer]:
+              - generic [ref=e1747]: defect
+              - generic [ref=e1748]: 1780:52
+              - generic [ref=e1749]: click 70%
+            - generic [ref=e1750] [cursor=pointer]:
+              - generic [ref=e1751]: defect
+              - generic [ref=e1752]: 1782:32
+              - generic [ref=e1753]: click 79%
+            - generic [ref=e1754] [cursor=pointer]:
+              - generic [ref=e1755]: defect
+              - generic [ref=e1756]: 1784:35
+              - generic [ref=e1757]: click 66%
+            - generic [ref=e1758] [cursor=pointer]:
+              - generic [ref=e1759]: defect
+              - generic [ref=e1760]: 1795:09
+              - generic [ref=e1761]: click 69%
+            - generic [ref=e1762] [cursor=pointer]:
+              - generic [ref=e1763]: defect
+              - generic [ref=e1764]: 1798:57
+              - generic [ref=e1765]: click 67%
+            - generic [ref=e1766] [cursor=pointer]:
+              - generic [ref=e1767]: defect
+              - generic [ref=e1768]: 1807:21
+              - generic [ref=e1769]: click 77%
+            - generic [ref=e1770] [cursor=pointer]:
+              - generic [ref=e1771]: defect
+              - generic [ref=e1772]: 1807:50
+              - generic [ref=e1773]: click 81%
+            - generic [ref=e1774] [cursor=pointer]:
+              - generic [ref=e1775]: defect
+              - generic [ref=e1776]: 1811:55
+              - generic [ref=e1777]: click 76%
+            - generic [ref=e1778] [cursor=pointer]:
+              - generic [ref=e1779]: defect
+              - generic [ref=e1780]: 1819:36
+              - generic [ref=e1781]: click 77%
+            - generic [ref=e1782] [cursor=pointer]:
+              - generic [ref=e1783]: defect
+              - generic [ref=e1784]: 1820:07
+              - generic [ref=e1785]: click 77%
+            - generic [ref=e1786] [cursor=pointer]:
+              - generic [ref=e1787]: defect
+              - generic [ref=e1788]: 1821:45
+              - generic [ref=e1789]: click 86%
+            - generic [ref=e1790] [cursor=pointer]:
+              - generic [ref=e1791]: defect
+              - generic [ref=e1792]: 1823:26
+              - generic [ref=e1793]: click 67%
+            - generic [ref=e1794] [cursor=pointer]:
+              - generic [ref=e1795]: defect
+              - generic [ref=e1796]: 1832:46
+              - generic [ref=e1797]: click 67%
+            - generic [ref=e1798] [cursor=pointer]:
+              - generic [ref=e1799]: defect
+              - generic [ref=e1800]: 1833:17
+              - generic [ref=e1801]: click 68%
+            - generic [ref=e1802] [cursor=pointer]:
+              - generic [ref=e1803]: defect
+              - generic [ref=e1804]: 1839:44
+              - generic [ref=e1805]: click 66%
+            - generic [ref=e1806] [cursor=pointer]:
+              - generic [ref=e1807]: defect
+              - generic [ref=e1808]: 1842:00
+              - generic [ref=e1809]: click 85%
+            - generic [ref=e1810] [cursor=pointer]:
+              - generic [ref=e1811]: defect
+              - generic [ref=e1812]: 1842:29
+              - generic [ref=e1813]: click 75%
+            - generic [ref=e1814] [cursor=pointer]:
+              - generic [ref=e1815]: defect
+              - generic [ref=e1816]: 1842:57
+              - generic [ref=e1817]: click 79%
+            - generic [ref=e1818] [cursor=pointer]:
+              - generic [ref=e1819]: defect
+              - generic [ref=e1820]: 1853:10
+              - generic [ref=e1821]: click 65%
+            - generic [ref=e1822] [cursor=pointer]:
+              - generic [ref=e1823]: defect
+              - generic [ref=e1824]: 1865:53
+              - generic [ref=e1825]: click 72%
+            - generic [ref=e1826] [cursor=pointer]:
+              - generic [ref=e1827]: defect
+              - generic [ref=e1828]: 1867:27
+              - generic [ref=e1829]: click 68%
+            - generic [ref=e1830] [cursor=pointer]:
+              - generic [ref=e1831]: defect
+              - generic [ref=e1832]: 1869:58
+              - generic [ref=e1833]: click 65%
+            - generic [ref=e1834] [cursor=pointer]:
+              - generic [ref=e1835]: transient
+              - generic [ref=e1836]: 1870:29
+              - generic [ref=e1837]: tonalOnset 99%
+            - generic [ref=e1838] [cursor=pointer]:
+              - generic [ref=e1839]: defect
+              - generic [ref=e1840]: 1871:31
+              - generic [ref=e1841]: click 77%
+            - generic [ref=e1842] [cursor=pointer]:
+              - generic [ref=e1843]: defect
+              - generic [ref=e1844]: 1873:41
+              - generic [ref=e1845]: click 67%
+            - generic [ref=e1846] [cursor=pointer]:
+              - generic [ref=e1847]: defect
+              - generic [ref=e1848]: 1885:44
+              - generic [ref=e1849]: click 71%
+            - generic [ref=e1850] [cursor=pointer]:
+              - generic [ref=e1851]: defect
+              - generic [ref=e1852]: 1886:04
+              - generic [ref=e1853]: click 77%
+            - generic [ref=e1854] [cursor=pointer]:
+              - generic [ref=e1855]: defect
+              - generic [ref=e1856]: 1894:12
+              - generic [ref=e1857]: click 66%
+            - generic [ref=e1858] [cursor=pointer]:
+              - generic [ref=e1859]: defect
+              - generic [ref=e1860]: 1898:15
+              - generic [ref=e1861]: click 71%
+            - generic [ref=e1862] [cursor=pointer]:
+              - generic [ref=e1863]: defect
+              - generic [ref=e1864]: 1904:22
+              - generic [ref=e1865]: click 73%
+            - generic [ref=e1866] [cursor=pointer]:
+              - generic [ref=e1867]: defect
+              - generic [ref=e1868]: 1906:24
+              - generic [ref=e1869]: click 86%
+            - generic [ref=e1870] [cursor=pointer]:
+              - generic [ref=e1871]: defect
+              - generic [ref=e1872]: 1908:27
+              - generic [ref=e1873]: click 84%
+            - generic [ref=e1874] [cursor=pointer]:
+              - generic [ref=e1875]: defect
+              - generic [ref=e1876]: 1910:29
+              - generic [ref=e1877]: click 83%
+            - generic [ref=e1878] [cursor=pointer]:
+              - generic [ref=e1879]: defect
+              - generic [ref=e1880]: 1912:22
+              - generic [ref=e1881]: click 64%
+            - generic [ref=e1882] [cursor=pointer]:
+              - generic [ref=e1883]: defect
+              - generic [ref=e1884]: 1912:30
+              - generic [ref=e1885]: click 81%
+            - generic [ref=e1886] [cursor=pointer]:
+              - generic [ref=e1887]: defect
+              - generic [ref=e1888]: 1914:33
+              - generic [ref=e1889]: click 80%
+            - generic [ref=e1890] [cursor=pointer]:
+              - generic [ref=e1891]: defect
+              - generic [ref=e1892]: 1924:45
+              - generic [ref=e1893]: click 76%
+            - generic [ref=e1894] [cursor=pointer]:
+              - generic [ref=e1895]: defect
+              - generic [ref=e1896]: 1926:47
+              - generic [ref=e1897]: click 67%
+            - generic [ref=e1898] [cursor=pointer]:
+              - generic [ref=e1899]: transient
+              - generic [ref=e1900]: 1928:14
+              - generic [ref=e1901]: tonalOnset 100%
+            - generic [ref=e1902] [cursor=pointer]:
+              - generic [ref=e1903]: defect
+              - generic [ref=e1904]: 1928:49
+              - generic [ref=e1905]: click 74%
+            - generic [ref=e1906] [cursor=pointer]:
+              - generic [ref=e1907]: defect
+              - generic [ref=e1908]: 1930:51
+              - generic [ref=e1909]: click 67%
+            - generic [ref=e1910] [cursor=pointer]:
+              - generic [ref=e1911]: defect
+              - generic [ref=e1912]: 1932:54
+              - generic [ref=e1913]: click 70%
+            - generic [ref=e1914] [cursor=pointer]:
+              - generic [ref=e1915]: defect
+              - generic [ref=e1916]: 1934:47
+              - generic [ref=e1917]: click 67%
+            - generic [ref=e1918] [cursor=pointer]:
+              - generic [ref=e1919]: defect
+              - generic [ref=e1920]: 1936:58
+              - generic [ref=e1921]: click 66%
+            - generic [ref=e1922] [cursor=pointer]:
+              - generic [ref=e1923]: defect
+              - generic [ref=e1924]: 1937:27
+              - generic [ref=e1925]: click 66%
+            - generic [ref=e1926] [cursor=pointer]:
+              - generic [ref=e1927]: defect
+              - generic [ref=e1928]: 1938:51
+              - generic [ref=e1929]: click 64%
+            - generic [ref=e1930] [cursor=pointer]:
+              - generic [ref=e1931]: defect
+              - generic [ref=e1932]: 1939:01
+              - generic [ref=e1933]: click 81%
+            - generic [ref=e1934] [cursor=pointer]:
+              - generic [ref=e1935]: defect
+              - generic [ref=e1936]: 1941:03
+              - generic [ref=e1937]: click 80%
+            - generic [ref=e1938] [cursor=pointer]:
+              - generic [ref=e1939]: defect
+              - generic [ref=e1940]: 1941:22
+              - generic [ref=e1941]: click 74%
+            - generic [ref=e1942] [cursor=pointer]:
+              - generic [ref=e1943]: defect
+              - generic [ref=e1944]: 1943:06
+              - generic [ref=e1945]: click 67%
+            - generic [ref=e1946] [cursor=pointer]:
+              - generic [ref=e1947]: defect
+              - generic [ref=e1948]: 1945:07
+              - generic [ref=e1949]: click 78%
+            - generic [ref=e1950] [cursor=pointer]:
+              - generic [ref=e1951]: defect
+              - generic [ref=e1952]: 1947:29
+              - generic [ref=e1953]: click 65%
+            - generic [ref=e1954] [cursor=pointer]:
+              - generic [ref=e1955]: defect
+              - generic [ref=e1956]: 1951:12
+              - generic [ref=e1957]: click 74%
+            - generic [ref=e1958] [cursor=pointer]:
+              - generic [ref=e1959]: defect
+              - generic [ref=e1960]: 1953:21
+              - generic [ref=e1961]: click 67%
+            - generic [ref=e1962] [cursor=pointer]:
+              - generic [ref=e1963]: defect
+              - generic [ref=e1964]: 1959:21
+              - generic [ref=e1965]: click 72%
+            - generic [ref=e1966] [cursor=pointer]:
+              - generic [ref=e1967]: defect
+              - generic [ref=e1968]: 1961:24
+              - generic [ref=e1969]: click 97%
+            - generic [ref=e1970] [cursor=pointer]:
+              - generic [ref=e1971]: defect
+              - generic [ref=e1972]: 1963:27
+              - generic [ref=e1973]: click 90%
+            - generic [ref=e1974] [cursor=pointer]:
+              - generic [ref=e1975]: defect
+              - generic [ref=e1976]: 1965:30
+              - generic [ref=e1977]: click 86%
+            - generic [ref=e1978] [cursor=pointer]:
+              - generic [ref=e1979]: defect
+              - generic [ref=e1980]: 1967:31
+              - generic [ref=e1981]: click 77%
+            - generic [ref=e1982] [cursor=pointer]:
+              - generic [ref=e1983]: defect
+              - generic [ref=e1984]: 1969:33
+              - generic [ref=e1985]: click 71%
+            - generic [ref=e1986] [cursor=pointer]:
+              - generic [ref=e1987]: defect
+              - generic [ref=e1988]: 1971:36
+              - generic [ref=e1989]: click 88%
+            - generic [ref=e1990] [cursor=pointer]:
+              - generic [ref=e1991]: defect
+              - generic [ref=e1992]: 1973:39
+              - generic [ref=e1993]: click 78%
+            - generic [ref=e1994] [cursor=pointer]:
+              - generic [ref=e1995]: defect
+              - generic [ref=e1996]: 1974:09
+              - generic [ref=e1997]: click 73%
+            - generic [ref=e1998] [cursor=pointer]:
+              - generic [ref=e1999]: defect
+              - generic [ref=e2000]: 1975:42
+              - generic [ref=e2001]: click 91%
+            - generic [ref=e2002] [cursor=pointer]:
+              - generic [ref=e2003]: defect
+              - generic [ref=e2004]: 1977:45
+              - generic [ref=e2005]: click 85%
+            - generic [ref=e2006] [cursor=pointer]:
+              - generic [ref=e2007]: defect
+              - generic [ref=e2008]: 1979:47
+              - generic [ref=e2009]: click 79%
+            - generic [ref=e2010] [cursor=pointer]:
+              - generic [ref=e2011]: defect
+              - generic [ref=e2012]: 1979:50
+              - generic [ref=e2013]: click 68%
+            - generic [ref=e2014] [cursor=pointer]:
+              - generic [ref=e2015]: defect
+              - generic [ref=e2016]: 1981:49
+              - generic [ref=e2017]: click 75%
+            - generic [ref=e2018] [cursor=pointer]:
+              - generic [ref=e2019]: defect
+              - generic [ref=e2020]: 1983:51
+              - generic [ref=e2021]: click 93%
+            - generic [ref=e2022] [cursor=pointer]:
+              - generic [ref=e2023]: defect
+              - generic [ref=e2024]: 1985:54
+              - generic [ref=e2025]: click 94%
+            - generic [ref=e2026] [cursor=pointer]:
+              - generic [ref=e2027]: defect
+              - generic [ref=e2028]: 1987:57
+              - generic [ref=e2029]: click 79%
+            - generic [ref=e2030] [cursor=pointer]:
+              - generic [ref=e2031]: defect
+              - generic [ref=e2032]: 1992:01
+              - generic [ref=e2033]: click 68%
+            - generic [ref=e2034] [cursor=pointer]:
+              - generic [ref=e2035]: beat
+              - generic [ref=e2036]: 2004:20
+            - generic [ref=e2038] [cursor=pointer]:
+              - generic [ref=e2039]: transient
+              - generic [ref=e2040]: 2007:43
+              - generic [ref=e2041]: tonalOnset 98%
+            - generic [ref=e2042] [cursor=pointer]:
+              - generic [ref=e2043]: defect
+              - generic [ref=e2044]: 2016:31
+              - generic [ref=e2045]: click 68%
+            - generic [ref=e2046] [cursor=pointer]:
+              - generic [ref=e2047]: defect
+              - generic [ref=e2048]: 2018:37
+              - generic [ref=e2049]: click 80%
+            - generic [ref=e2050] [cursor=pointer]:
+              - generic [ref=e2051]: defect
+              - generic [ref=e2052]: 2022:41
+              - generic [ref=e2053]: click 73%
+            - generic [ref=e2054] [cursor=pointer]:
+              - generic [ref=e2055]: defect
+              - generic [ref=e2056]: 2024:43
+              - generic [ref=e2057]: click 75%
+            - generic [ref=e2058] [cursor=pointer]:
+              - generic [ref=e2059]: defect
+              - generic [ref=e2060]: 2054:17
+              - generic [ref=e2061]: click 67%
+            - generic [ref=e2062] [cursor=pointer]:
+              - generic [ref=e2063]: defect
+              - generic [ref=e2064]: 2058:22
+              - generic [ref=e2065]: click 67%
+            - generic [ref=e2066] [cursor=pointer]:
+              - generic [ref=e2067]: defect
+              - generic [ref=e2068]: 2064:09
+              - generic [ref=e2069]: click 66%
+            - generic [ref=e2070] [cursor=pointer]:
+              - generic [ref=e2071]: defect
+              - generic [ref=e2072]: 2070:51
+              - generic [ref=e2073]: click 68%
+            - generic [ref=e2074] [cursor=pointer]:
+              - generic [ref=e2075]: defect
+              - generic [ref=e2076]: 2070:54
+              - generic [ref=e2077]: click 65%
+            - generic [ref=e2078] [cursor=pointer]:
+              - generic [ref=e2079]: defect
+              - generic [ref=e2080]: 2075:40
+              - generic [ref=e2081]: click 69%
+            - generic [ref=e2082] [cursor=pointer]:
+              - generic [ref=e2083]: defect
+              - generic [ref=e2084]: 2088:02
+              - generic [ref=e2085]: click 66%
+            - generic [ref=e2086]: Showing 500 of 42905 — narrow the kind filter to see the rest.
+        - generic [ref=e2087]: No marker selected.
+  - generic [ref=e2088]:
+    - heading "Statistics (M09)" [level=2] [ref=e2089]
+    - generic [ref=e2090]:
+      - generic [ref=e2091]:
+        - generic [ref=e2092]:
+          - term [ref=e2093]: Sample rate
+          - definition [ref=e2094]: 48000 Hz
+        - generic [ref=e2095]:
+          - term [ref=e2096]: Channels
+          - definition [ref=e2097]: "2"
+        - generic [ref=e2098]:
+          - term [ref=e2099]: Crest factor
+          - definition [ref=e2100]: 14.6 dB
+        - generic [ref=e2101]:
+          - term [ref=e2102]: Dynamic range (DR)
+          - definition [ref=e2103]: "10.1"
+      - table [ref=e2104]:
+        - row "Ch Peak RMS DC offset Crest Bit depth Dither" [ref=e2105]:
+          - columnheader "Ch" [ref=e2106]
+          - columnheader "Peak" [ref=e2107]
+          - columnheader "RMS" [ref=e2108]
+          - columnheader "DC offset" [ref=e2109]
+          - columnheader "Crest" [ref=e2110]
+          - columnheader "Bit depth" [ref=e2111]
+          - columnheader "Dither" [ref=e2112]
+        - row "0 -1.0 dBFS -15.8 dBFS -0.0002 14.7 dB float, 16-bit quantisation grid detected unlikely" [ref=e2113]:
+          - cell "0" [ref=e2114]
+          - cell "-1.0 dBFS" [ref=e2115]
+          - cell "-15.8 dBFS" [ref=e2116]
+          - cell "-0.0002" [ref=e2117]
+          - cell "14.7 dB" [ref=e2118]
+          - cell "float, 16-bit quantisation grid detected" [ref=e2119]
+          - cell "unlikely" [ref=e2120]
+        - row "1 -1.3 dBFS -15.5 dBFS 0.0001 14.2 dB float, 16-bit quantisation grid detected unlikely" [ref=e2121]:
+          - cell "1" [ref=e2122]
+          - cell "-1.3 dBFS" [ref=e2123]
+          - cell "-15.5 dBFS" [ref=e2124]
+          - cell "0.0001" [ref=e2125]
+          - cell "14.2 dB" [ref=e2126]
+          - cell "float, 16-bit quantisation grid detected" [ref=e2127]
+          - cell "unlikely" [ref=e2128]
+      - generic [ref=e2129]:
+        - generic [ref=e2130]:
+          - term [ref=e2131]: Correlation
+          - definition [ref=e2132]: "0.91"
+        - generic [ref=e2133]:
+          - term [ref=e2134]: Balance
+          - definition [ref=e2135]: 0.2 dB
+        - generic [ref=e2136]:
+          - term [ref=e2137]: Mono compatibility
+          - definition [ref=e2138]: "-0.2 dB"
+  - generic [ref=e2139]:
+    - heading "Metadata (M15)" [level=2] [ref=e2140]
+    - generic [ref=e2141]:
+      - generic [ref=e2142]:
+        - generic [ref=e2143]:
+          - term [ref=e2144]: Title
+          - definition [ref=e2145]: Lone Wolf
+          - button "Copy" [ref=e2146]
+        - generic [ref=e2147]:
+          - term [ref=e2148]: Artist
+          - definition [ref=e2149]: NGL
+          - button "Copy" [ref=e2150]
+        - generic [ref=e2151]:
+          - term [ref=e2152]: Album artist
+          - definition [ref=e2153]: NGL
+          - button "Copy" [ref=e2154]
+        - generic [ref=e2155]:
+          - term [ref=e2156]: Album
+          - definition [ref=e2157]: Lone Wolf
+          - button "Copy" [ref=e2158]
+        - generic [ref=e2159]:
+          - term [ref=e2160]: Genre
+          - definition [ref=e2161]: UK Drill
+          - button "Copy" [ref=e2162]
+        - generic [ref=e2163]:
+          - term [ref=e2164]: Year
+          - definition [ref=e2165]: "2026"
+          - button "Copy" [ref=e2166]
+      - generic [ref=e2167]:
+        - heading "Cover art (1)" [level=3] [ref=e2168]
+        - figure "Front cover Cover image/png, 1,315,664 bytes" [ref=e2170]:
+          - img "Cover" [ref=e2171]
+          - generic [ref=e2172]:
+            - generic [ref=e2173]: Front cover
+            - generic [ref=e2174]: Cover
+            - generic [ref=e2175]: image/png, 1,315,664 bytes
+      - generic [ref=e2176]:
+        - heading "Lyrics" [level=3] [ref=e2177]
+        - generic [ref=e2178]:
+          - paragraph [ref=e2179]: Unsynced · id3v2.3 · eng
+          - generic [ref=e2180]: "[Intro] (wolf howl) Yo, yo… They don’t see the grind, nah, they don’t see the fight, I’m in the server room, I'm active, howlin’ through the night. No Basecamp pings, nah, I don’t check the threads, I dont care; just me, my S.F.T.P., and the nank in their head. [Verse 1] I’m the chef in the kitchen, but I cook solo, see? No stand-ups, no Meet, nah, that’s not my decree. You lot chat in Basecamp, I’m in vim yo, no cap, While you’re stuck in a loop, I’m editing files live (skeng!), like that. I’m the ghost in the logs, yeah, I’m a Don in the code, You think it’s magic, doughnut? (BAP BAP BAP!!) It’s just a lone wolf’s load. Git commit? Git out. I don’t do that ting, I S.F.T.P. that file up—boom—it’s live, no in-between. [Pre-Chorus] They say, \"Nigel, use a framework,\" I say, \"I am the framework, man\" You want React? Vue? Nah, I’ll write my own—it’s got no docs, fam. You want a package? I’ll fix it, roll my own, It won’t work with yours, and I swear that’s the point bro. [Chorus] Lone wolf, howlin’ at the moon, No Git, no PRs, just me and the tune. Saving the biz, I'm gassed I’m the last of my kind, Old school, no rules, it's nature, leave the weak ones behind. Lone wolf, S.F.T.P. in my veins, You lot need a guide? Nah, I thrive in the pain. Lone wolf! [Verse 2] Code loaded, magazine full, I'm mashing in the yard, Reload the webpage, yeah, I'm going hard. The DevOps boys opps, they can't battle my flow, I'm wetting all these deploys while they still don't know. Clip full of scripts, nah, I ain't missin' shots, Git commit? That's weak—I'm live in the hot. My yard's the codebase, yeah, I'm mandem alone, While they're catching bugs, I'm sitting on the throne. [Bridge] (Beat drops, just a dark, pulsing bass and the sound of a dial-up modem) Ammo's my toolbelt, every function a round, I'm blazing through the codebase, ain't a frame gonna slow me down. Pull requests? Nah man, I don't rate that ting, Direct to production—that's how I bring the sting. [Chorus] Lone wolf, howlin’ at the moon, No Git, no PRs, just me and the tune. Save the biz, yeah, I’m the last of my kind, Old school, no rules, leave the weak ones behind. Lone wolf, SFTP in my veins, You lot need a guide? Nah, I thrive in the pain. Lone wolf! [Outro] (Beat fades, wolf howl, sound of a server rebooting) Yo… it’s just me, the server, and the midnight oil, You lot need a break? Weak! I’m built for the toil. So when the site’s down and the pressure’s high, You know who to call… the S.T.P.F. guy. (Lone wolf!)"
+      - generic [ref=e2181]:
+        - heading "Raw / unmapped tags (1)" [level=3] [ref=e2182]
+        - paragraph [ref=e2183]: Everything this parser recognised but doesn't map onto a named field — nothing is silently dropped.
+        - table [ref=e2184]:
+          - row "Key Value Source" [ref=e2185]:
+            - columnheader "Key" [ref=e2186]
+            - columnheader "Value" [ref=e2187]
+            - columnheader "Source" [ref=e2188]
+            - columnheader [ref=e2189]
+          - row "WOAS https://suno.com/song/580ccb08-e89d-47dd-b8d3-a58a1abd70dd id3v2.3 Copy" [ref=e2190]:
+            - cell "WOAS" [ref=e2191]
+            - cell "https://suno.com/song/580ccb08-e89d-47dd-b8d3-a58a1abd70dd" [ref=e2192]
+            - cell "id3v2.3" [ref=e2193]
+            - cell "Copy" [ref=e2194]:
+              - button "Copy" [ref=e2195]
